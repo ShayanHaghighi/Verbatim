@@ -5,6 +5,7 @@ from sqlalchemy import String
 
 class UserProfile(db.Model):
     __tablename__ = 'user_profile'
+    __table_args__ = {'extend_existing': True}
     
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(30),unique=True, nullable=False)

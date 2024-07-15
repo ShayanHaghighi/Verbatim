@@ -17,3 +17,10 @@ class Deck(db.Model):
         UniqueConstraint('deck_name', 'user_profile_id', name='owner_of_deck'),
     )
 
+    def to_dict(self):
+        return {
+            'id' : self.id,
+            'deck_name' : self.deck_name,
+            'owner_id' : self.user_profile_id,
+        }
+
