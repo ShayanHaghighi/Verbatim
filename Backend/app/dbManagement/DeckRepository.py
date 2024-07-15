@@ -11,6 +11,11 @@ def get_by_id(id:int) -> Deck:
 
 def delete_(deck:Deck):
     db.session.delete(deck)
+    db.session.commit()
+
+def delete_by_id(id:int):
+    db.session.delete(get_by_id(id))
+    db.session.commit()
 
 def update_(deck:Deck):
     db_deck = get_by_id(deck.id)
@@ -20,3 +25,6 @@ def update_(deck:Deck):
         db.session.commit()
     else:
         print("Error: update object does not exist")
+
+def commit():
+    db.session.commit()
