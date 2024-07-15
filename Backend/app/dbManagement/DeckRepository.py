@@ -25,6 +25,3 @@ def update_(deck:Deck):
         db.session.commit()
     else:
         print("Error: update object does not exist")
-
-def commit():
-    db.session.commit()
