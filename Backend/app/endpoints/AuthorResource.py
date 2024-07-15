@@ -1,17 +1,17 @@
 from flask import request, Blueprint, jsonify
 import json
 
-from ..models.Quote import Quote
+from ..models.Author import Author
 from ..dbManagement import DeckRepository as deck_repo
 from ..dbManagement import QuoteRepository as quote_repo
 from ..dbManagement import AuthorRepository as author_repo
 
-quote_route = Blueprint('quotes',__name__)
+author_route = Blueprint('authors',__name__)
 
 
 
-@quote_route.route('/quote',methods=['GET','POST'])
-def quote_endpoint():
+@author_route.route('/author',methods=['GET','POST'])
+def author_endpoint():
     if request.method == 'GET':
 
         # get all decks for the current logged in user
@@ -29,25 +29,16 @@ def quote_endpoint():
 
 
         # check if request is in right format
-        if  not 'author_id'  in user_request.keys() or \
-            not 'quote_text' in user_request.keys() or \
+        if  not 'author_name'  in user_request.keys() or \
             not 'deck_id'    in user_request.keys():
                 
                 response = {
                 "error": "Bad Request",
-                "message": "provide author_id, deck_id and quote_text"
+                "message": "provide author_name and deck_id"
                 }
                 return jsonify(response),400
 
         # check if user profile exists
-        author = author_repo.get_by_id(int(user_request['author_id'])) 
-        if author == None:
-            response = {
-            "error": "Bad Request",
-            "message": "Author does not exist"
-            }
-            return jsonify(response),400
-        
         deck = deck_repo.get_by_id(int(user_request['deck_id'])) 
         if deck == None:
             response = {
@@ -55,38 +46,36 @@ def quote_endpoint():
             "message": "Deck does not exist"
             }
             return jsonify(response),400
-
-        # save deck to database
-        quote_new = Quote()
         
-        quote_new.quote_text = user_request['quote_text']
-        quote_new.deck = deck
-        quote_new.author = author
+        # save deck to database
+        author_new = Author()
+        
+        author_new.author_name = user_request['author_name']
+        author_new.deck = deck
 
 
-        quote_repo.save_(quote_new)
-        return jsonify({"message": "Quote created successfully"}), 200
+        author_repo.save_(author_new)
+        return jsonify({"message": "Author created successfully"}), 200
 
 
+@author_route.route('/author/<id>',methods=['GET','DELETE','PATCH'])
+def get_author(id):
 
-@quote_route.route('/quote/<id>',methods=['GET','DELETE','PATCH'])
-def get_quote(id):
 
+    author = author_repo.get_by_id(id) 
 
-    quote = quote_repo.get_by_id(id) 
-
-    if quote == None:
+    if author == None:
         response = {
         "error": "Bad Request",
-        "message": "Quote with given ID does not exist"
+        "message": "Author with given ID does not exist"
         }
         return jsonify(response),400
     
     if request.method == 'GET':
-        return quote.to_dict()
+        return author.to_dict()
     
     if request.method == 'DELETE':
-        quote_repo.delete_(quote)
+        author_repo.delete_(author)
         return jsonify({"message": "Deck deleted successfully"}), 200
 
 
@@ -105,8 +94,8 @@ def get_quote(id):
         
         
 
-        if 'quote_text' in user_request.keys():
-            quote.quote_text = user_request['quote_text']
-            quote_repo.update_(quote)
-        return jsonify({"message": "Quote updated successfully"}), 200
+        if 'author_name' in user_request.keys():
+            author.author_name = user_request['author_name']
+            author_repo.update_(author)
+        return jsonify({"message": "Deck updated successfully"}), 200
  

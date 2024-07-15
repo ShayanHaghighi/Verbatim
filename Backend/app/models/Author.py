@@ -14,8 +14,16 @@ class Author(db.Model):
 
 
     quotes = relationship('Quote',back_populates='author')
+    deck = relationship('Deck')
 
 
 
     __table_args__ = (UniqueConstraint('author_name','deck_id',name='person_in_deck'),)
 
+    def to_dict(self):
+        print(f"quotes: {list(map(lambda quote: quote.to_dict(),self.quotes))}")
+        return {
+            'id' : self.id,
+            'deck_id' : self.deck_id,
+            'quotes' : list(map(lambda quote: quote.to_dict(),self.quotes)),
+        }

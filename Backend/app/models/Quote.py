@@ -11,4 +11,13 @@ class Quote(db.Model):
     deck_id: Mapped[int] = mapped_column(ForeignKey('deck.id'), nullable=False)
     author_id: Mapped[int] = mapped_column(ForeignKey('author.id'), nullable=False)
 
-    author = relationship('Author', back_populates='quotes')
+    deck = relationship('Deck', back_populates='quotes')
+    author = relationship('Author')
+
+    def to_dict(self):
+        return {
+            'id' : self.id,
+            'quote_text' : self.quote_text,
+            'deck_id' : self.deck_id,
+            'author_id' : self.author_id,
+        }
