@@ -1,4 +1,4 @@
-from Backend import db
+from app import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, UniqueConstraint, String
 

@@ -1,4 +1,4 @@
-from Backend import db
+from app import db
 from ..models.Deck import Deck
 from sqlalchemy import select, delete, update
 

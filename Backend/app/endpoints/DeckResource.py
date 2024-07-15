@@ -10,7 +10,8 @@ deck = Blueprint('exmaple',__name__)
 def deck_endpoint():
     if request.method == 'POST':
         deck = json.loads(request.data)
-        print(deck['example'])
+        deck_db = Deck()
+        deck_db.deck_name = deck['deck_name']
         return deck
 
 @deck.route('/deck/<id>',methods=['GET','DELETE'])

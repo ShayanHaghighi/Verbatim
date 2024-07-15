@@ -1,9 +1,9 @@
-from Backend import db
-from flask_login import UserMixin
+from app import db
+# from flask_login import UserMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String
 
-class UserProfile(db.Model,UserMixin):
+class UserProfile(db.Model):
     __tablename__ = 'user_profile'
     
     id: Mapped[int] = mapped_column(primary_key=True)
