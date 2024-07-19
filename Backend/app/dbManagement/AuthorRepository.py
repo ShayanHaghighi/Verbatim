@@ -1,6 +1,6 @@
 from app import db
 from ..models.Author import Author
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, and_
 
 def save_(author:Author):
     db.session.add(author)
@@ -8,6 +8,10 @@ def save_(author:Author):
 
 def get_by_id(id:int) -> Author:
     return db.session.execute(select(Author).where(Author.id == id)).scalar_one_or_none()
+
+def get_by_author_and_deck_id(author_name,deck_id):
+    return db.session.execute(select(Author).where(and_(Author.author_name == author_name,Author.deck_id == deck_id))).scalar_one_or_none()
+
 
 def delete_(author:Author):
     db.session.delete(author)
