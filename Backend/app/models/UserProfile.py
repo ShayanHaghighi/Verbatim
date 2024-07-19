@@ -10,8 +10,17 @@ class UserProfile(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(30),unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(50),unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(50),unique=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(162), nullable=False)
     
     decks = relationship('Deck', back_populates='owner')
+
+    def to_dict(self):
+        return {
+            'id' : self.id,
+            'username' : self.username,
+            'email' : self.email,
+            # TODO: figure out if you want to keep this as to_dict_short()
+            'decks': list(map(lambda deck: deck.to_dict(),self.decks))
+        }
 
 

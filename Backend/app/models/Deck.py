@@ -24,6 +24,16 @@ class Deck(db.Model):
             'id' : self.id,
             'deck_name' : self.deck_name,
             'owner_id' : self.user_profile_id,
-            'quotes': list(map(lambda quote: quote.to_dict(),self.quotes))
+            'quotes': list(map(lambda quote: quote.to_dict(),self.quotes)),
+            'authors': list(map(lambda author: author.to_dict(),self.authors)),
+        }
+    
+    def to_dict_short(self):
+        return {
+            'id' : self.id,
+            'deck_name' : self.deck_name,
+            'owner_id' : self.user_profile_id,
+            'num_quotes': len(self.quotes),
+            'num_authors': len(self.authors)
         }
 
