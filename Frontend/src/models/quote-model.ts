@@ -1,12 +1,11 @@
-import IDeck from "./deck-model";
 import IAuthor from "./author-model";
 
 interface IQuote {
   id: number;
-  text: string;
+  quote_text: string;
   date_created: Date;
-  deck?: IDeck | null;
-  author?: IAuthor | null;
+  deck_id: number | null;
+  author: IAuthor | null; // in backend, can be null
 }
 
 export default IQuote;

@@ -1,19 +1,18 @@
 import { useState, ChangeEvent, FormEvent, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { TokenContext } from "../../App";
+import { TokenContext, SetTokenContext } from "../../App";
 
 interface FormData {
   deck_name: string;
-  owner_id: string;
 }
 
 function Create_Deck() {
   const token = useContext(TokenContext);
+  const setToken = useContext(SetTokenContext);
 
   const [formData, setFormData] = useState<FormData>({
     deck_name: "",
-    owner_id: "",
   });
 
   const navigate = useNavigate();
@@ -28,23 +27,27 @@ function Create_Deck() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (formData.deck_name !== "" && formData.owner_id !== "") {
+    if (formData.deck_name !== "") {
       axios({
         method: "POST",
-        url: "/deck",
+        url: "/api/deck",
         headers: {
           Authorization: "Bearer " + token,
         },
         data: {
           deck_name: formData.deck_name,
-          owner_id: formData.owner_id,
         },
       })
         .then((response) => {
+          response.data.access_token && setToken(response.data.access_token);
           navigate("/deck");
         })
         .catch((error) => {
           if (error.response) {
+            if (error.response.status === 401) {
+              navigate("/login");
+              return;
+            }
             // TODO show this message to the user
             console.log(error.response.data.message);
             console.log(error.response);
@@ -52,7 +55,7 @@ function Create_Deck() {
         });
     } else {
       // TODO Change to send user valid warning
-      console.log("please enter deck name/owner id");
+      console.log("please enter deck name");
     }
   };
 
@@ -64,13 +67,6 @@ function Create_Deck() {
           id="deck_name"
           name="deck_name"
           value={formData.deck_name}
-          onChange={handleChange}
-        />
-        <label htmlFor="owner_id">Onwer Id:</label>
-        <input
-          id="owner_id"
-          name="owner_id"
-          value={formData.owner_id}
           onChange={handleChange}
         />
       </div>

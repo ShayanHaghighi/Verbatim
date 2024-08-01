@@ -1,5 +1,6 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   user_name: string;
@@ -8,6 +9,9 @@ interface FormData {
 }
 // TODO change props from any typing
 function SignUpForm(props: any) {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     user_name: "",
     email: "",
@@ -25,17 +29,20 @@ function SignUpForm(props: any) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!!formData.user_name && !!formData.email && !!formData.password) {
+      setIsLoading(true);
+
       axios({
         method: "POST",
-        url: "/login",
+        url: "/api/signup",
         data: {
-          user_name: formData.user_name,
+          username: formData.user_name,
           email: formData.email,
           password: formData.password,
         },
       })
         .then((response) => {
           props.setToken(response.data.access_token);
+          navigate("/home");
         })
         .catch((error) => {
           if (error.response) {
@@ -53,39 +60,42 @@ function SignUpForm(props: any) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="user_name">User Name:</label>
-        <input
-          type="text"
-          id="user_name"
-          name="user_name"
-          value={formData.user_name}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+    <>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="user_name">User Name:</label>
+          <input
+            type="text"
+            id="user_name"
+            name="user_name"
+            value={formData.user_name}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+      {isLoading && <p>loading...</p>}
+    </>
   );
 }
 

@@ -6,8 +6,9 @@ from flask import current_app
 import datetime
 from psycopg2 import errors
 from werkzeug.security import generate_password_hash
+from datetime import date
 
-
+from app.models.UserProfile import UserProfile
 db = SQLAlchemy()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:Taytay21@localhost:5432/verbatimproject"
@@ -16,18 +17,14 @@ db.init_app(app)
 
 class UserProfile(db.Model):
     __tablename__ = 'user_profile'
+    __table_args__ = {'extend_existing': True}
     
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(30),unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(50),unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(162), nullable=False)
-
-
     
-    decks = relationship('Deck', back_populates='owner')
-
-
-
+    decks = relationship('Deck', back_populates='owner',cascade="all,delete")
 
 
 
@@ -39,20 +36,17 @@ class Deck(db.Model):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     deck_name: Mapped[str] = mapped_column(String(20),nullable=False)
+    date_created: Mapped[date] = mapped_column(Date,nullable=True)
 
     user_profile_id: Mapped[int] = mapped_column(ForeignKey('user_profile.id'), nullable=False)
     
     owner = relationship('UserProfile', back_populates='decks')
+    quotes = relationship('Quote', back_populates='deck',cascade="all,delete")
+    authors = relationship('Author', back_populates='deck',cascade="all,delete")
     
     __table_args__ = (
         UniqueConstraint('deck_name', 'user_profile_id', name='owner_of_deck'),
     )
-
-
-
-
-
-
 
 
 
@@ -61,12 +55,13 @@ class Quote(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     quote_text: Mapped[str] = mapped_column(nullable=False)
-    date_created: Mapped[datetime.date] = mapped_column(Date,nullable=True)
+    date_created: Mapped[date] = mapped_column(Date,nullable=True)
 
     deck_id: Mapped[int] = mapped_column(ForeignKey('deck.id'), nullable=False)
-    author_id: Mapped[int] = mapped_column(ForeignKey('author.id'), nullable=False)
+    author_id: Mapped[int] = mapped_column(ForeignKey('author.id'), nullable=True)
 
-    author = relationship('Author', back_populates='quotes')
+    deck = relationship('Deck', back_populates='quotes')
+    author = relationship('Author')
 
 
 class Author(db.Model):
@@ -76,15 +71,15 @@ class Author(db.Model):
 
     author_name: Mapped[str] = mapped_column(String(50),nullable=False)
 
-    deck_id: Mapped[int] = mapped_column(ForeignKey('deck.id'), nullable=False)
+    deck_id: Mapped[int] = mapped_column(ForeignKey('deck.id'), nullable=True)
 
 
     quotes = relationship('Quote',back_populates='author')
+    deck = relationship('Deck')
 
 
 
     __table_args__ = (UniqueConstraint('author_name','deck_id',name='person_in_deck'),)
-
 
 
 

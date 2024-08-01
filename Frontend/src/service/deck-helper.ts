@@ -17,4 +17,4 @@ function delete_deck() {}
 
 function update_deck() {}
 
-// feel free to add helper functions
+// feel free to add more functions to help you

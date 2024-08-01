@@ -9,8 +9,6 @@ from ..dbManagement import AuthorRepository as author_repo
 
 author_route = Blueprint('authors',__name__)
 
-
-
 @author_route.route('/author',methods=['GET','POST'])
 @jwt_required()
 def author_endpoint():
@@ -33,7 +31,7 @@ def author_endpoint():
         deck_id = request.json.get("deck_id", None)
         author_name = request.json.get("author_name", None)
 
-        if author_repo.get_by_author_and_deck_id(author_name=author_name,deck_id=deck_id):
+        if author_name and deck_id and author_repo.get_by_author_and_deck_id(author_name=author_name,deck_id=deck_id):
             return {"msg":"author with this name already exists in this deck"},400
 
 

@@ -12,8 +12,8 @@ class Deck(db.Model):
     user_profile_id: Mapped[int] = mapped_column(ForeignKey('user_profile.id'), nullable=False)
     
     owner = relationship('UserProfile', back_populates='decks')
-    quotes = relationship('Quote', back_populates='deck')
-    authors = relationship('Author', back_populates='deck')
+    quotes = relationship('Quote', back_populates='deck',cascade="all,delete")
+    authors = relationship('Author', back_populates='deck',cascade="all,delete")
     
     __table_args__ = (
         UniqueConstraint('deck_name', 'user_profile_id', name='owner_of_deck'),
@@ -25,8 +25,13 @@ class Deck(db.Model):
             'deck_name' : self.deck_name,
             'owner_id' : self.user_profile_id,
             'quotes': list(map(lambda quote: quote.to_dict(),self.quotes)),
-            'authors': list(map(lambda author: author.to_dict(),self.authors)),
         }
+    
+    def get_authors(self):
+        return list(map(lambda author: author.author_name,self.authors))
+        
+    def get_quotes(self):
+        return list(map(lambda quote: quote.get_as_questions(),self.quotes))
     
     def to_dict_short(self):
         return {
