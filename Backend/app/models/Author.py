@@ -10,7 +10,7 @@ class Author(db.Model):
 
     author_name: Mapped[str] = mapped_column(String(50),nullable=False)
 
-    deck_id: Mapped[int] = mapped_column(ForeignKey('deck.id'), nullable=False)
+    deck_id: Mapped[int] = mapped_column(ForeignKey('deck.id'), nullable=True)
 
 
     quotes = relationship('Quote',back_populates='author')
@@ -33,6 +33,5 @@ class Author(db.Model):
             'id' : self.id,
             'author_name':self.author_name,
             'deck_id' : self.deck_id,
-            'num_quotes' : len(self.quotes),
         }
     

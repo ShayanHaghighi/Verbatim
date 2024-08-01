@@ -1,11 +1,10 @@
 import IQuote from "./quote-model";
-import IDeck from "./deck-model";
 
 interface IAuthor {
   id: number;
-  name: string;
+  author_name: string;
   quotes?: IQuote[] | null;
-  deck?: IDeck | null;
+  deck_id: number | null;
 }
 
 export default IAuthor;

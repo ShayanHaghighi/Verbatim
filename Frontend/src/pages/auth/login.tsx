@@ -9,6 +9,7 @@ interface FormData {
 // TODO change props from any typing
 function LoginForm(props: any) {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -26,9 +27,10 @@ function LoginForm(props: any) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!!formData.email && !!formData.password) {
+      setIsLoading(true);
       axios({
         method: "POST",
-        url: "/login",
+        url: "/api/login",
         data: {
           email: formData.email,
           password: formData.password,
@@ -36,7 +38,7 @@ function LoginForm(props: any) {
       })
         .then((response) => {
           props.setToken(response.data.access_token);
-          navigate("/");
+          navigate("/home");
         })
         .catch((error) => {
           if (error.response) {
@@ -53,29 +55,32 @@ function LoginForm(props: any) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-      </div>
-      <button type="submit">Sign Up</button>
-    </form>
+    <>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      {isLoading && <p>loading...</p>}
+    </>
   );
 }
 

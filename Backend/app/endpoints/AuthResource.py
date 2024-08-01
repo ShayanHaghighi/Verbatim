@@ -11,7 +11,7 @@ from ..models.UserProfile import UserProfile
 
 tokens_route = Blueprint('tokens',__name__)
 
-
+# TODO: implement refresh tokens?
 @tokens_route.after_request
 def refresh_expiring_jwts(response):
     try:
@@ -35,7 +35,6 @@ def create_token():
 
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    print(email,password)
     if not email or not password:
         return {"msg": "Please provide email and password"}, 400
 
@@ -46,7 +45,6 @@ def create_token():
         return {"msg": "User with that email does not exist"}, 400
 
     password_correct = check_password_hash(user.password_hash,password)
-    print(password_correct)
     if not password_correct:
         return {"msg": "Incorrect password"}, 400
 
@@ -101,8 +99,11 @@ def logout():
 @jwt_required()
 def my_profile():
     response_body = {
-        "text":"you now have accesses a protected resource!",
-        "identity": get_jwt_identity()
-    }
+        "msg":"access-token accepted"
+}
 
-    return response_body
+    return response_body,200
+
+
+
+

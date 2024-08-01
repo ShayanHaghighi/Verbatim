@@ -12,7 +12,7 @@ class UserProfile(db.Model):
     email: Mapped[str] = mapped_column(String(50),unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(162), nullable=False)
     
-    decks = relationship('Deck', back_populates='owner')
+    decks = relationship('Deck', back_populates='owner',cascade="all,delete")
 
     def to_dict(self):
         return {

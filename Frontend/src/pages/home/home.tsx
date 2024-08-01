@@ -1,22 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import UnLoggedInHome from "./home-unauth";
-import LoggedInHome from "./home-auth";
 
-function Home(props: any) {
+function Home() {
   const navigate = useNavigate();
-  // const [isAuthenticated, setAuthenticated] = useState(false);
-  const isAuthenticated = !!sessionStorage.getItem("token");
-
-  // setAuthenticated(!!sessionStorage.getItem("token"));
 
   return (
     <>
-      {isAuthenticated ? (
-        <LoggedInHome removeToken={props.removeToken} />
-      ) : (
-        <UnLoggedInHome />
-      )}
+      <button onClick={() => navigate("/login")}>Login</button>
+      <button onClick={() => navigate("/signup")}>Sign Up</button>
+      <button onClick={() => navigate("/game/play")}>Join Game</button>
     </>
   );
 }

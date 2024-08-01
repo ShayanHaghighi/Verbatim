@@ -1,59 +1,53 @@
 from flask import request, Blueprint, jsonify
 import json
-from flask_jwt_extended import get_jwt_identity,jwt_required
+from flask_jwt_extended import get_jwt_identity,jwt_required,create_access_token,get_jwt
+from datetime import datetime, timedelta, timezone
 
 from ..models.Deck import Deck
 from ..dbManagement import DeckRepository as deck_repo
 from ..dbManagement import UserProfileRepository as user_repo
+from ..endpoints.AuthResource import refresh_expiring_jwts
 
-import sqlalchemy
+from sqlalchemy import exc
 
 deck_route = Blueprint('decks',__name__)
 
-def response_400(message:str):
-    return jsonify({
-        "error":"Bad Request",
-        "message":message
-    }),400
 
+@deck_route.after_request
+def refresh(response):
+    return refresh_expiring_jwts(response)
+    
 
 @deck_route.route('/deck',methods=['GET','POST'])
 @jwt_required()
 def deck_endpoint():
     if request.method == 'GET':
-        decks = (user_repo.get_by_id(get_jwt_identity()).to_dict())["decks"]
+        decks = {"decks":(user_repo.get_by_id(get_jwt_identity()).to_dict())["decks"]}
 
         return decks,200
 
     if request.method == 'POST':
-        if request.data == b'':
-            return response_400("provide deck_name")
 
-        deck :dict = json.loads(request.data)
+        # get the deck name from the request body
+        deck_name = request.json.get("deck_name", None)
 
-        # check if request is in right format
-        if not 'deck_name' in deck.keys():
-            return response_400("provide deck_name")
+        # check if deck_name attribute was provided
+        if not deck_name:
+            return {"msg":"provide deck_name"},400
 
 
         # check if user profile exists
         owner = user_repo.get_by_id(get_jwt_identity()) 
         if owner == None:
             return {"msg":"error - user not found"}
-
-
+        new_deck = Deck(deck_name=deck_name,owner=owner)
         # save deck to database
-        deck_new = Deck()
-        deck_new.deck_name = deck['deck_name']
-        deck_new.owner = owner
-        print(deck_new.owner)
         try:
-            deck_repo.save_(deck_new)
-        except sqlalchemy.exc.IntegrityError:
-            return response_400("Deck already exists")
+            deck_repo.save_(new_deck)
+        except exc.IntegrityError:
+            return {"msg":"deck with that name already exists"},400
 
-
-        return jsonify({"message": "Deck created successfully", "deck_id": deck_new.id}), 200
+        return jsonify({"message": "Deck created successfully", "deck_id": new_deck.id}), 200
 
     
 

@@ -1,0 +1,47 @@
+.container {
+  margin: 0.5rem;
+  border: 1px solid grey;
+  width: fit-content;
+  border-radius: 0.25rem;
+  user-select: none;
+}
+
+.head {
+  width: fit-content;
+  padding: 0.5rem;
+  border: 1px solid grey;
+  background-color: #f5f5f5;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  flex: auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.dropdown-icon {
+  position: relative;
+  transform: rotate(0turn);
+  transition: transform 0.3s ease-in;
+}
+
+.rotated {
+  transform: rotate(0.5turn);
+}
+
+.content {
+  text-align: center;
+  max-height: 0px;
+  transition: max-height 0.5s;
+}
+
+.showing {
+  max-height: 100px;
+
+  height: 100%;
+}
+
+.option {
+  border: 0.2px solid grey;
+  cursor: pointer;
+  padding: 0.5rem;
+}
