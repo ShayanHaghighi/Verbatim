@@ -20,11 +20,11 @@ def create_app():
 
     socketio = SocketIO(backend, cors_allowed_origins="*")
 
-    from app.endpoints.DeckResource import deck_route
-    from app.endpoints.QuoteResource import quote_route
-    from app.endpoints.AuthorResource import author_route
-    from app.endpoints.AuthResource import tokens_route
-    from app.endpoints.UserProfileResource import user_profile_route
+    from Backend.app.endpoints.DeckEndpoint import deck_route
+    from Backend.app.endpoints.QuoteEndpoint import quote_route
+    from Backend.app.endpoints.AuthorEndpoint import author_route
+    from Backend.app.endpoints.AuthEndpoint import tokens_route
+    from Backend.app.endpoints.UserEndpoint import user_profile_route
     from app.endpoints.game.GameResource import game_route
 
     backend.register_blueprint(quote_route, url_prefix='/api')
