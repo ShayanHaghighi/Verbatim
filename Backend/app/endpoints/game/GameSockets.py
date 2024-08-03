@@ -9,6 +9,7 @@ from ...dbManagement import DeckRepository as deck_repo
 players = {}
 
 TOKEN_LENGTH = 32
+WAITING,QUESTION,ANSWER,REBUTTAL,RESULTS = [0,1,2,3,4]
 
 def gen_token():
     return ''.join(SystemRandom().choice(ascii_lowercase + digits) for _ in range(TOKEN_LENGTH))
@@ -83,7 +84,7 @@ def init_sockets(socketio:SocketIO):
 
         join_room(game_code)
         emit('joined-game', {"game_token":game_token})
-        send_message_to_client(sid=game.owner_sid,event="players-update",body={"players": game.get_player_names()})
+        emit("players-update",{"players": game.get_player_names()},to=game.owner_sid)
 
 
     # @socketio.on("disconnect-custom")
@@ -100,6 +101,8 @@ def init_sockets(socketio:SocketIO):
 
     @socketio.on("start-game")
     def handle_start_game(data:dict):
+        print("start game")
+
         game_code = data.get("game_code",None)
         game:Game = games.get(game_code,None)
         game_token = data.get("game_token",None)
@@ -116,6 +119,7 @@ def init_sockets(socketio:SocketIO):
                 return
             else:
                 game.owner_sid = request.sid
+        game.state = QUESTION
 
         first_question = game.questions[0]['quote']
         options = list(game.author_scores.keys())
@@ -151,7 +155,9 @@ def init_sockets(socketio:SocketIO):
 
     @socketio.on("question-finished")
     def handle_question_finished(data:dict):
+        print("question finshed")
         game_code = data.get("game_code",None)
+        print(game_code) 
         game:Game = games.get(game_code,None)
         game_token = data.get("game_token",None)
         if not game_token:
@@ -163,6 +169,7 @@ def init_sockets(socketio:SocketIO):
         if game.owner_token == game_token:
             if game.owner_sid != request.sid:
                 game.owner_sid = request.sid
+            game.state = ANSWER
             emit('question-finished',to=game.game_code)
             emit('player-scores',game.get_players())
         else:
@@ -170,6 +177,8 @@ def init_sockets(socketio:SocketIO):
 
     @socketio.on("start-rebuttal")
     def handle_rebuttal_start(data:dict):
+        print("rebuttal start")
+
         game_code = data.get("game_code",None)
         game:Game = games.get(game_code,None)
         game_token = data.get("game_token",None)
@@ -183,6 +192,7 @@ def init_sockets(socketio:SocketIO):
         if game.owner_token == game_token:
             if game.owner_sid != request.sid:
                 game.owner_sid = request.sid
+            game.state = REBUTTAL
             author = game.questions[game.current_q_index]['author']
             emit('start-rebuttal',{"author_name":author},to=game.game_code)
             emit('rebuttal-details',{"question":game.questions[game.current_q_index]})
@@ -191,6 +201,7 @@ def init_sockets(socketio:SocketIO):
     
     @socketio.on("rebuttal-vote")
     def handle_rebuttal_vote(data:dict):
+        print("rebuttal vote")
         game_code = data.get("game_code",None)
         game:Game = games.get(game_code,None)
         score = data.get("score",None)
@@ -210,6 +221,8 @@ def init_sockets(socketio:SocketIO):
         
     @socketio.on("rebuttal-end")
     def handle_rebuttal_end(data:dict):
+        print("rebuttal-end")
+
         game_code = data.get("game_code",None)
         game:Game = games.get(game_code,None)
         game_token = data.get("game_token",None)
@@ -221,6 +234,7 @@ def init_sockets(socketio:SocketIO):
                 game.owner_sid = request.sid
             game.current_q_index += 1
             if game.current_q_index < game.num_questions:
+                game.state = QUESTION
                 question = game.questions[game.current_q_index]['quote']
                 options = list(set([question['author'] for question in game.questions]))
                 message = {"question":question,"options":options}
@@ -228,15 +242,50 @@ def init_sockets(socketio:SocketIO):
                 emit('question',message ,to=game_code)
                 send_message_to_client(game.owner_sid,'question', body=message)
             else:
+                game.state = RESULTS
                 emit('game-end' ,to=game_code)
                 emit('game-end',{"authorVotes":game.author_scores},to=game.owner_sid)
 
         else:
             emit('user-error',"you are not permitted to do that action")
 
+    @socketio.on("update")
+    def handle_update(data:dict):
+        print("update")
+        game_code = data.get("game_code",None)
+        game:Game = games.get(game_code,None)
+        game_token = data.get("game_token",None)
+        if not game_token:
+            emit("user-error", {"error:":"Please provide a game_token"})
+            return
+        if game.owner_token == game_token:
+            game.owner_sid = request.sid
+            if game.state == WAITING:
+                emit("update",{"state":"waiting","players": game.get_player_names()})
+            elif game.state == QUESTION:
+                question = game.questions[game.current_q_index]['quote']
+                options = list(set([question['author'] for question in game.questions]))
+                message = {"question":question,"options":options}
+                emit('update',{"state":"question","question":message})
+            elif game.state == ANSWER:
+                emit('update',{"state":"answer","scores":game.get_players()})
+            elif game.state == REBUTTAL:
+                emit('update',{"state":"rebuttal","question":game.questions[game.current_q_index]})
+            elif game.state == RESULTS:
+                emit('update',{"state":"results","authorVotes":game.author_scores},to=game.owner_sid)
 
+    @socketio.on("end-game")
+    def handle_end_game(data:dict):
+        game_code = data.get("game_code",None)
+        game:Game = games.get(game_code,None)
+        game_token = data.get("game_token",None)
+        if not game_token:
+            emit('game-deleted')
+        elif game.owner_token == game_token:
+            del game
+            emit('game-deleted')
 
-
+    
 
     def send_message_to_client(sid,event, body=""):
         socketio.emit(event, body, room=sid)
