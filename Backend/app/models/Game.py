@@ -5,6 +5,8 @@ GAME_CODE_LENGTH = 6
 
 games:dict = {}
 
+WAITING,QUESTION,ANSWER,REBUTTAL,RESULTS = [0,1,2,3,4]
+
 class Game():
     def __init__(self,deck:Deck,num_questions=1,password=None) -> None:
         self.game_code = gen_code()
@@ -13,6 +15,7 @@ class Game():
         self.owner_sid = None
         self.owner_token = None
         self.current_q_index = 0
+        self.state = WAITING
         self.num_questions = num_questions
         self.questions = sample(deck.get_quotes(),num_questions)
         self.author_scores = {author:0 for author in deck.get_authors()}

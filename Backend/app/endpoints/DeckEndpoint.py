@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from ..models.Deck import Deck
 from ..dbManagement import DeckRepository as deck_repo
 from ..dbManagement import UserProfileRepository as user_repo
-from ..endpoints.AuthResource import refresh_expiring_jwts
+from .AuthEndpoint import refresh_expiring_jwts
 
 from sqlalchemy import exc
 
