@@ -1,4 +1,4 @@
-import { Player } from "../game-host";
+import { Player } from "../../game-models";
 
 export default function HostResults({
   authorVotes,

@@ -1,15 +1,13 @@
-import { Player, Question } from "../game-host";
 import client from "../../socket-connection";
+import { Player, Question } from "../../game-models";
 
-function Host_Question({
-  question,
-  game_code,
-  players,
-}: {
+interface props {
   question: Question | null;
   game_code: string | null;
   players: Player[];
-}) {
+}
+
+function Host_Question({ question, game_code, players }: props) {
   function endRound() {
     client.emit("question-finished", {
       game_code: game_code,

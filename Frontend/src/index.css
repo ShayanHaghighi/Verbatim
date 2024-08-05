@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bkg: 212 208 255;
+    --color-notbkg: 18 6 45;
+    --color-blk: 0 0 0;
+    --color-wht: 255 255 255;
+    --color-purple: 122 28 249;
+    --color-darkpurple: 36 0 95;
+    --color-accent1: 100 75 200;
+    --color-accent2: 145 118 255;
+  }
+  :root[data-theme="dark"] {
+    --color-bkg: 18 6 45;
+    --color-blk: 255 255 255;
+    --color-wht: 0 0 0;
+    --color-purple: 208 178 255;
+    --color-darkpurple: 135 90 209;
+    --color-notbkg: 212 208 255;
+  }
+}

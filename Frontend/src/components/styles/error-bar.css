@@ -1,0 +1,19 @@
+.error-box {
+  background-color: rgb(181, 0, 0);
+  color: white;
+  width: 80%;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: space-between;
+  /* font-weight: 600; */
+}
+
+.error-box > span {
+  padding: 0.2rem;
+  cursor: pointer;
+}
+
+.error-box > span:hover {
+  background-color: rgb(100, 0, 0);
+}

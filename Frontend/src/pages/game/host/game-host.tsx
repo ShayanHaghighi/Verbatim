@@ -1,31 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Host_Create_Game from "./game_states/create";
 import Host_Question from "./game_states/question";
-import client from "../socket-connection";
 import HostAnswer from "./game_states/answer";
 import HostRebuttal from "./game_states/rebuttal";
 import HostResults from "./game_states/results";
 
-interface gameStates {
-  state: "waiting" | "question" | "answer" | "rebuttal" | "results";
-}
+import { Vote, gameStates, Player, Question } from "../game-models";
 
-export interface Question {
-  question: string;
-  options?: string[];
-  answer?: string | null;
-}
+import client from "../socket-connection";
 
-export interface Player {
-  name: string;
-  score: number;
-  hasAnswered: boolean;
-}
-
-export interface Vote {
-  voteCaster: string;
-  score: number;
-}
 interface FormData {
   numQuestions: number;
   password: string;
@@ -33,7 +18,7 @@ interface FormData {
 }
 
 function Game_Owner() {
-  const [gameCode, setGameCode] = useState(null);
+  const [gameCode, setGameCode] = useState<string | null>(null);
   const [playersJoined, setPlayersJoined] = useState<Player[]>([]);
   const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
@@ -44,6 +29,16 @@ function Game_Owner() {
     password: "",
     deck: null,
   });
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (sessionStorage.getItem("game_code")) {
+      console.log("asking for updates");
+      client.emit("update", {
+        game_token: sessionStorage.getItem("game_token"),
+        game_code: sessionStorage.getItem("game_code"),
+      });
+    }
+  }, []);
 
   function create_game(password: string) {
     console.log("sending req to server");
@@ -66,9 +61,51 @@ function Game_Owner() {
     client.once("connect", () => {
       console.log("Connected to server");
     });
+
+    client.on("update", (data) => {
+      setGameCode(sessionStorage.getItem("game_code"));
+      setGameState({ state: data.state });
+      switch (data.state) {
+        case "waiting": {
+          // TODO change players object to incorporate 'hasAnswered'
+          let temp: Player[] = [];
+          data.players.forEach((player_name: any) => {
+            temp.push({ name: player_name, score: 0, hasAnswered: false });
+          });
+          setPlayersJoined(temp);
+          break;
+        }
+        case "question": {
+          setCurrentQuestion({
+            question: data.question.question,
+            options: data.question.options,
+          });
+          break;
+        }
+        case "answer": {
+          setPlayersJoined(data.scores);
+          break;
+        }
+        case "rebuttal": {
+          setCurrentQuestion({
+            question: data.question.quote,
+            answer: data.question.author,
+          });
+          setCurrentVotes([]);
+          break;
+        }
+        case "results": {
+          setAuthorVotes(data.authorVotes);
+          break;
+        }
+      }
+    });
+
     client.on("code", (data) => {
       console.log("Received message:", data);
       setGameCode(data.game_code);
+      sessionStorage.setItem("game_code", data.game_code);
+
       sessionStorage.setItem("game_token", data.game_token);
     });
     client.on("players-update", (data) => {
@@ -91,6 +128,7 @@ function Game_Owner() {
 
       setCurrentQuestion({ question: res.question, options: res.options });
       setGameState({ state: "question" });
+      sessionStorage.setItem("state", "question");
       setPlayersJoined((prevPlayers) => {
         return prevPlayers.map((player: Player) => ({
           ...player,
@@ -110,6 +148,7 @@ function Game_Owner() {
       console.log(res);
       setPlayersJoined(res);
       setGameState({ state: "answer" });
+      sessionStorage.setItem("state", "answer");
     });
     client.on("rebuttal-details", (res) => {
       console.log("rebbutal details:");
@@ -118,8 +157,9 @@ function Game_Owner() {
         question: res.question.quote,
         answer: res.question.author,
       });
-      setGameState({ state: "rebuttal" });
       setCurrentVotes([]);
+      setGameState({ state: "rebuttal" });
+      sessionStorage.setItem("state", "rebuttal");
     });
     client.on("rebuttal-vote", (res) => {
       console.log(currentVotes);
@@ -131,6 +171,14 @@ function Game_Owner() {
     client.on("game-end", (res) => {
       setAuthorVotes(res.authorVotes);
       setGameState({ state: "results" });
+      sessionStorage.setItem("state", "results");
+    });
+
+    client.on("game-deleted", () => {
+      sessionStorage.removeItem("game_token");
+      sessionStorage.removeItem("game_code");
+
+      navigate("/home");
     });
 
     client.on("disconnect", (reason) => {
@@ -141,8 +189,16 @@ function Game_Owner() {
     };
   }, [client]);
 
+  function endGame() {
+    client.emit("end-game", {
+      game_code: gameCode,
+      game_token: sessionStorage.getItem("game_token"),
+    });
+  }
+
   return (
     <>
+      <button onClick={endGame}>End Game</button>
       {gameState.state == "waiting" && (
         <Host_Create_Game
           create_game={create_game}

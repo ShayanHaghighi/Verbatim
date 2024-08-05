@@ -1,13 +1,12 @@
 import client from "../../socket-connection";
-import { Player } from "../game-host";
+import { Player } from "../../game-models";
 
-export default function HostAnswer({
-  gameCode,
-  players,
-}: {
+interface props {
   gameCode: string | null;
   players: Player[];
-}) {
+}
+
+export default function HostAnswer({ gameCode, players }: props) {
   function startRebuttal() {
     client.emit("start-rebuttal", {
       game_code: gameCode,

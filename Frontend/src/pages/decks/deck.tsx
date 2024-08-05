@@ -1,51 +1,30 @@
-import { useEffect, useContext, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import { TokenContext, SetTokenContext } from "../../App";
-import IDeck from "../../models/deck-model";
+import IDeck, { IDeckShort } from "../../models/deck-model";
 import DeckComponent from "./deck-component";
+import deckHelper from "../../service/deck-helper";
 
 function Deck() {
-  const [decks, setDecks] = useState<IDeck[]>([]);
+  const { getAllDecks } = deckHelper();
+  const [decks, setDecks] = useState<IDeckShort[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const token = useContext(TokenContext);
-  const setToken = useContext(SetTokenContext);
-
-  const navigate = useNavigate();
-
   useEffect(() => {
-    axios({
-      method: "GET",
-      url: "/api/deck",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    })
+    getAllDecks()
       .then((response) => {
-        response.data.access_token && setToken(response.data.access_token);
-        setDecks(response.data.decks);
+        setDecks(response);
         setIsLoaded(true);
-        // console.log(temp);
       })
       .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 401) {
-            navigate("/login");
-            return;
-          }
-          // TODO show this message to the user
-          console.log(error.response.data.message);
-          console.log(error.response);
-        }
+        console.log("there has been an error");
+        console.log(error);
       });
   }, []);
 
   return (
     <>
       {!isLoaded && <p>loading...</p>}
-      <ul>
+      <ul className="mt-12 w-3/4 flex flex-col  justify-center items-center">
         {decks.map((deck) => (
           <DeckComponent deck={deck} />
         ))}

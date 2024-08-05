@@ -10,3 +10,11 @@ interface IDeck {
 }
 
 export default IDeck;
+
+export interface IDeckShort {
+  id: number;
+  deck_name: string;
+  owner_id: number;
+  num_quotes?: number;
+  num_authors?: number;
+}
