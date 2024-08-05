@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 
-import "./dropdown.css";
+import "./styles/dropdown.css";
 
 export default function Dropdown({
   list,

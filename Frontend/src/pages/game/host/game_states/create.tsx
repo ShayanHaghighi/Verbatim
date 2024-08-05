@@ -1,9 +1,8 @@
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
-import { Player } from "../game-host";
-import axios from "axios";
-import { TokenContext, SetTokenContext } from "../../../../App";
-import { useNavigate } from "react-router-dom";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Player } from "../../game-models";
 import Dropdown from "../../../../components/dropdown";
+import deckHelper from "../../../../service/deck-helper";
+import IDeck from "../../../../models/deck-model";
 
 interface FormData {
   numQuestions: number;
@@ -29,41 +28,21 @@ function Host_Create_Game({
 }: GameOwnerProps) {
   const [isCreating, setIsCreating] = useState(true);
   const [usingPass, setUsingPass] = useState(false);
-  const [decks, setDecks] = useState([]);
-
-  const token = useContext(TokenContext);
-  const setToken = useContext(SetTokenContext);
-
-  const navigate = useNavigate();
+  const [decks, setDecks] = useState<IDeck[]>([]);
+  const { getAllDecks } = deckHelper();
 
   useEffect(() => {
-    axios({
-      method: "GET",
-      url: "/api/deck",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    })
+    getAllDecks()
       .then((response) => {
-        response.data.access_token && setToken(response.data.access_token);
-        setDecks(response.data.decks);
+        setDecks(response);
         setFormData((prevData) => ({
           ...prevData,
-          deck: response.data.decks[0],
+          deck: response[0],
         }));
       })
       .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 401) {
-            console.log(error.response);
-
-            navigate("/login");
-            return;
-          }
-          // TODO show this message to the user
-          console.log(error.response.data.message);
-          console.log(error.response);
-        }
+        console.log("there has been an error");
+        console.log(error);
       });
   }, []);
 

@@ -1,15 +1,10 @@
 import axios from "axios";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import { TokenContext, SetTokenContext } from "../../App";
 
 // TODO remove any typing
 function LoggedInHome(props: any) {
   const [isLoading, setIsLoading] = useState(false);
-
-  const token = useContext(TokenContext);
-  const setToken = useContext(SetTokenContext);
 
   const navigate = useNavigate();
 
@@ -17,28 +12,6 @@ function LoggedInHome(props: any) {
     if (!sessionStorage.getItem("token")) {
       navigate("/");
     }
-    axios({
-      method: "GET",
-      // TODO: what endpoint do I want to query to test if access-token works?
-      url: "/api/test",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((response) => {
-        response.data.access_token && setToken(response.data.access_token);
-        return;
-      })
-      .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 401) {
-            navigate("/");
-          }
-          // TODO show this message to the user
-          console.log(error.response.data.message);
-          console.log(error.response);
-        }
-      });
   }, []);
 
   function logMeOut() {
@@ -47,7 +20,7 @@ function LoggedInHome(props: any) {
       method: "POST",
       url: "/api/logout",
     })
-      .then((response) => {
+      .then(() => {
         props.removeToken();
         navigate("/");
       })
