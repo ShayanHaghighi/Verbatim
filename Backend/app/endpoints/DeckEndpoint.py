@@ -22,6 +22,10 @@ def refresh(response):
 @jwt_required()
 def deck_endpoint():
     if request.method == 'GET':
+        if request.args.get('short')=="true":
+            decks = {"decks":list(map(lambda deck: deck.to_dict_short(),deck_repo.get_all_by_owner_id(get_jwt_identity())))}
+            return decks,200
+
         decks = {"decks":(user_repo.get_by_id(get_jwt_identity()).to_dict())["decks"]}
 
         return decks,200

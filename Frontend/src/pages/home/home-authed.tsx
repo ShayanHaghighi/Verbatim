@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/loading";
 
 // TODO remove any typing
 function LoggedInHome(props: any) {
@@ -35,13 +36,10 @@ function LoggedInHome(props: any) {
 
   return (
     <>
-      <button onClick={logMeOut}>Logout</button>
-      <p>logged in home page</p>
       <button onClick={() => navigate("/deck")}>Decks</button>
       <button onClick={() => navigate("/deck/create")}>Create Deck</button>
       <button onClick={() => navigate("/game/host")}>Host Game</button>
-      <button onClick={() => navigate("/game/play")}>Join Game</button>
-      {isLoading && <p>loading...</p>}
+      {!isLoading && <Loading />}
     </>
   );
 }

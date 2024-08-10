@@ -1,7 +1,8 @@
 from flask import request, Blueprint, jsonify
 import json
 from flask_jwt_extended import get_jwt_identity,jwt_required
-
+from datetime import datetime
+import re
 
 from ..models.Quote import Quote
 from ..dbManagement import DeckRepository as deck_repo
@@ -35,6 +36,10 @@ def quote_endpoint():
         quote_text = request.json.get("quote_text", None)
         author_name = request.json.get("author_name", None)
         author_id = request.json.get("author_id", None)
+        string_date:str = request.json.get("date", None)
+
+        if string_date:
+            date = datetime(re.findall(r"[\w']+", string_date))
 
         if not (deck_name or deck_id) or not (author_name or author_id) or not quote_text:
             return {"msg":"please provide author_name/author_id, deck_name/deck_id and quote_text"},400
@@ -53,7 +58,7 @@ def quote_endpoint():
             return {"msg":"Author must be from given deck"},400
 
         # save deck to database
-        quote_new = Quote(quote_text=quote_text , deck=deck , author=author)
+        quote_new = Quote(quote_text=quote_text , deck=deck , author=author,date_created=date)
         quote_repo.save_(quote_new)
         return {"message": "Quote created successfully"}, 200
 

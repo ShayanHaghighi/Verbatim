@@ -112,15 +112,15 @@ function SignUpForm(props: any) {
         className="mb-20 flex items-center flex-col justify-center w-2/3 max-w-4xl p-6"
         onSubmit={handleSubmit}
       >
-        <div className="flex flex-col items-start justify-center w-full m-4">
+        <div className=" flex flex-col items-start justify-center w-full m-4">
           <label
-            className="mb-4 text-4xl font-bold text-blk"
+            className="mb-4 text-2xl sm:text-4xl font-bold text-blk"
             htmlFor="user_name"
           >
             User Name
           </label>
           <input
-            className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht placeholder:text-xl text-xl text-blk"
+            className="w-full p-4 border border-gray-400 rounded-2xl h-12 sm:h-16 bg-wht text-md  text-blk"
             type="text"
             id="user_name"
             name="user_name"
@@ -130,11 +130,14 @@ function SignUpForm(props: any) {
           />
         </div>
         <div className="flex flex-col items-start justify-center w-full m-4">
-          <label className="mb-4 text-4xl font-bold text-blk" htmlFor="email">
-            Email
+          <label
+            className="mb-2 text-2xl sm:text-4xl font-bold text-blk"
+            htmlFor="email"
+          >
+            Email Address
           </label>
           <input
-            className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht placeholder:text-xl text-xl text-blk"
+            className="w-full p-4 border border-gray-400 rounded-2xl h-12 sm:h-16 bg-wht text-md  text-blk"
             type="email"
             id="email"
             name="email"
@@ -146,24 +149,24 @@ function SignUpForm(props: any) {
         <div className="flex flex-col items-start justify-center w-full m-4">
           <div className="w-full flex flex-row justify-between items-center">
             <label
-              className="mb-4 text-4xl font-bold text-blk"
+              className="mb-4 text-2xl sm:text-4xl  font-bold text-blk"
               htmlFor="password"
             >
               Password
             </label>
-            <span className="text-lg cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out">
+            <span className="text-sm ml-2 pb-4 sm:p-0 cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out text-end">
               Forgot password?
             </span>
           </div>
           <div className="w-full relative">
             <input
-              className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht placeholder:text-xl text-xl text-blk"
+              className="w-full p-4 border border-gray-400 rounded-2xl h-12 sm:h-16 bg-wht text-md sm:text-xl text-blk"
               type={showingPassword ? "text" : "password"}
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="************"
+              placeholder="**********"
             />
             {showingPassword ? (
               <FaEyeSlash
@@ -178,8 +181,8 @@ function SignUpForm(props: any) {
             )}
           </div>
         </div>
-        <div className="flex flex-col justify-center items-center">
-          <span className="mt-8 text-lg text-blk">
+        <div className="mt-2 sm:mt-8 flex flex-col justify-center items-center  text-center">
+          <span className="text-md sm:text-lg text-blk">
             Already have an account?{" "}
             <span
               className="cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out"
@@ -192,7 +195,7 @@ function SignUpForm(props: any) {
           <button className="btn-purple select-none" type="submit">
             Sign Up
           </button>
-          <span className="font-sm mt-4 text-blk">
+          <span className="text-[2vw] sm:text-sm mt-4 text-blk">
             By continuing, you agree to our{" "}
             <span className=" text-purple cursor-pointer">
               Terms of Service

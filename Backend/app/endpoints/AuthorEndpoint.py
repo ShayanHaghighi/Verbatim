@@ -100,3 +100,7 @@ def get_author(id):
         author_repo.update_(author)
         return jsonify({"message": "Deck updated successfully"}), 200
  
+
+@author_route.route('/author/images/<id>',methods=['GET'])
+def auth_images(id):
+    return "hi",200

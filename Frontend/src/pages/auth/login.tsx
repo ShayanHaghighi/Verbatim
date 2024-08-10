@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect, useContext } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
@@ -6,18 +6,20 @@ import { useNavigate } from "react-router-dom";
 // import "./styles.css";
 import ErrorBar from "../../components/error-bar";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { TokenContext } from "../../App";
 
 interface FormData {
   email: string;
   password: string;
 }
 // TODO change props from any typing
-function LoginForm(props: any) {
+function LoginForm() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setisError] = useState("");
   const [showingPassword, setShowingPassword] = useState(false);
+  const { token, removeToken, setToken } = useContext(TokenContext);
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -52,7 +54,7 @@ function LoginForm(props: any) {
         },
       })
         .then((response) => {
-          props.setToken(response.data.access_token);
+          setToken(response.data.access_token);
           navigate("/home");
         })
         .catch((error) => {
@@ -79,11 +81,14 @@ function LoginForm(props: any) {
         className="mb-48 flex items-center flex-col justify-center w-2/3 max-w-4xl p-6"
       >
         <div className="flex flex-col items-start justify-center w-full m-4">
-          <label className="mb-4 text-4xl font-bold text-blk" htmlFor="email">
+          <label
+            className="mb-4 text-2xl sm:text-4xl font-bold text-blk"
+            htmlFor="email"
+          >
             Email Address
           </label>
           <input
-            className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht placeholder:text-xl text-xl text-blk"
+            className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht text-md  text-blk"
             type="email"
             id="email"
             name="email"
@@ -95,24 +100,24 @@ function LoginForm(props: any) {
         <div className="flex flex-col items-start justify-center w-full m-4">
           <div className="w-full flex flex-row justify-between items-center">
             <label
-              className="mb-4 text-4xl font-bold text-blk"
+              className="mb-4 text-2xl sm:text-4xl  font-bold text-blk"
               htmlFor="password"
             >
               Password
             </label>
-            <span className="text-lg cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out">
+            <span className="text-sm ml-2 pb-4 sm:p-0 cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out text-end">
               Forgot password?
             </span>
           </div>
           <div className="w-full relative">
             <input
-              className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht placeholder:text-xl text-xl text-blk"
+              className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht text-md sm:text-xl text-blk"
               type={showingPassword ? "text" : "password"}
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="************"
+              placeholder="**********"
             />
             {showingPassword ? (
               <FaEyeSlash
@@ -127,7 +132,7 @@ function LoginForm(props: any) {
             )}
           </div>
         </div>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center  text-center">
           <span className="mt-8 text-lg text-blk">
             Don't have an account?{" "}
             <span

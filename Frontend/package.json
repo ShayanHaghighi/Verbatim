@@ -2,10 +2,10 @@
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
-  "proxy": "http://localhost:5000",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "local": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "backend": "cd ../Backend && flask --app main run",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

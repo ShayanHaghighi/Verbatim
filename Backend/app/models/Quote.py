@@ -21,6 +21,7 @@ class Quote(db.Model):
             'id' : self.id,
             'quote_text' : self.quote_text,
             'deck_id' : self.deck_id,
+            'date_created' : self.date_created,
             'author' : self.author.to_dict_short(),
         }
     

@@ -12,13 +12,19 @@
     --color-darkpurple: 36 0 95;
     --color-accent1: 100 75 200;
     --color-accent2: 145 118 255;
+    --color-gray: 235 235 235;
+    --color-whtpp: 255 255 255;
   }
   :root[data-theme="dark"] {
     --color-bkg: 18 6 45;
+    --color-notbkg: 212 208 255;
     --color-blk: 255 255 255;
     --color-wht: 0 0 0;
     --color-purple: 208 178 255;
     --color-darkpurple: 135 90 209;
-    --color-notbkg: 212 208 255;
+    --color-accent1: 100 75 200;
+    --color-accent2: 145 118 255;
+    --color-gray: 55 43 80;
+    --color-whtpp: 26 17 49;
   }
 }

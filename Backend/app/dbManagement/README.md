@@ -21,5 +21,3 @@ save_(author1)
 ```
 
 This function takes in an Author object and saves it to the database
-
-TODO: are all 4 files necessary?

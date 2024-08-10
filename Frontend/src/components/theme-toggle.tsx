@@ -14,7 +14,7 @@ const ThemeToggle = () => {
     }
   }, [isDark]);
   return (
-    <label className="relative inline-flex items-center cursor-pointer mr-6">
+    <label className="relative items-center cursor-pointer mr-6 hidden md:inline-flex">
       <input
         type="checkbox"
         className="sr-only peer"

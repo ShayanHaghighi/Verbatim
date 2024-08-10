@@ -5,7 +5,7 @@ interface IDeck {
   id: number;
   deck_name: string;
   owner_id: number;
-  quotes?: IQuote[] | null;
+  quotes: IQuote[] | null;
   authors?: IAuthor[] | null;
 }
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import IDeck, { IDeckShort } from "../models/deck-model";
+import IQuote from "../models/quote-model";
 import { TokenContext } from "../App";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,60 +7,19 @@ import { useNavigate } from "react-router-dom";
 // this function should request all of the decks for the current logged in user. (can be done with GET request to /deck)
 // the function should then parse the response and create a list of IDeck objects, and then return those IDeck objects
 // pro tip 😎: try making the right API requests in Postman, then translate the request you did to this function
-export default function deckHelper() {
+export default function quoteHelper() {
   const navigate = useNavigate();
   const { token, removeToken, setToken } = useContext(TokenContext);
-
-  async function getAllDecks(): Promise<IDeckShort[]> {
-    if (!token) {
-      navigate("/login");
-      return Promise.reject();
-    }
-    return new Promise<IDeck[]>((resolve, reject) => {
-      axios({
-        method: "GET",
-        url: "/api/deck?short=true",
-        ...getHeader(),
-      })
-        .then((response) => {
-          response.data.access_token && setToken(response.data.access_token);
-          resolve(response.data.decks);
-        })
-        .catch((error) => {
-          checkUnauthorised(error);
-          reject(error);
-        });
-    });
-  }
-
-  async function getDeck(deckId: number): Promise<IDeck> {
-    if (!token) {
-      navigate("/login");
-      return Promise.reject();
-    }
-    return new Promise<IDeck>((resolve, reject) => {
-      axios({
-        method: "GET",
-        url: `/api/deck/${deckId}`,
-        ...getHeader(),
-      })
-        .then((response) => {
-          response.data.access_token && setToken(response.data.access_token);
-          resolve(response.data);
-        })
-        .catch((error) => {
-          // console.log(error.response.status);
-          // console.log(token);
-          checkUnauthorised(error);
-          reject(error);
-        });
-    });
-  }
 
   // arguments: deck_name, access_token
   // send a request to the backend to create a new deck entry
   // return the results (status code/message)
-  async function createDeck(deckName: string): Promise<void> {
+  async function createQuote(
+    quote_text: string,
+    date: string,
+    deck_id: number,
+    author_id?: number
+  ): Promise<void> {
     if (!token) {
       navigate("/login");
       return Promise.reject();
@@ -68,16 +27,19 @@ export default function deckHelper() {
     return new Promise<void>((resolve, reject) => {
       axios({
         method: "POST",
-        url: "/api/deck",
+        url: "/api/quote",
         ...getHeader(),
 
         data: {
-          deck_name: deckName,
+          quote_text: quote_text,
+          author_id: author_id,
+          date: date,
+          deck_id: deck_id,
         },
       })
         .then((response) => {
           response.data.access_token && setToken(response.data.access_token);
-          navigate("/deck");
+          navigate(`/deck/${deck_id}`);
           resolve();
         })
         .catch((error) => {
@@ -107,6 +69,6 @@ export default function deckHelper() {
 
   function update_deck() {}
 
-  return { getAllDecks, createDeck, getDeck };
+  return { createQuote };
 }
 // feel free to add more functions to help you

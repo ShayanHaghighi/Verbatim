@@ -11,6 +11,8 @@ players = {}
 TOKEN_LENGTH = 32
 WAITING,QUESTION,ANSWER,REBUTTAL,RESULTS = [0,1,2,3,4]
 
+# TODO: add game code as url query param
+
 def gen_token():
     return ''.join(SystemRandom().choice(ascii_lowercase + digits) for _ in range(TOKEN_LENGTH))
 
