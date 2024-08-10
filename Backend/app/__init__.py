@@ -13,6 +13,7 @@ def create_app():
 
     db.init_app(backend)
 
+
     backend.config["JWT_SECRET_KEY"] = "please-remember-to-change-me"
     backend.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     jwt = JWTManager(backend)
