@@ -1,11 +1,16 @@
-from flask import request, Blueprint, jsonify
+from flask import request, Blueprint, jsonify,send_file
 import json
 from flask_jwt_extended import get_jwt_identity,jwt_required
+from os import path, getcwd, makedirs
 
 from ..models.Author import Author
 from ..dbManagement import DeckRepository as deck_repo
 from ..dbManagement import QuoteRepository as quote_repo
 from ..dbManagement import AuthorRepository as author_repo
+from ..models.Game import games,Player,Game
+
+IMAGE_DIR = "assets/author_images"
+
 
 author_route = Blueprint('authors',__name__)
 
@@ -102,5 +107,62 @@ def get_author(id):
  
 
 @author_route.route('/author/images/<id>',methods=['GET'])
+@jwt_required()
 def auth_images(id):
-    return "hi",200
+    if request.method == 'GET':
+        author = author_repo.get_by_id(id)
+        
+        
+        if not author:
+            return {"error":"invalid US scan ID"},404
+        dir = path.join("..","assets","author_images")
+        image_path = path.join(dir,f"{id}.png")
+        return send_file(image_path, mimetype='image/png')
+    
+
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            return jsonify({"error": "No image file provided"}), 400
+        # print("keys:")
+        # print(request.files.keys())
+        # print(request.files)
+        file = request.files['image']
+
+
+        # if file.filename == '':
+        #     return jsonify({"error": "No selected file"}), 400
+
+        if not file.filename.lower().endswith(('.png')):
+            return jsonify({"error": "Unsupported file type - only png is supported"}), 400
+
+        image_path = IMAGE_DIR+f"/{id}.png"
+        file.save(image_path)
+
+@author_route.route('/author/images',methods=['GET'])
+# @jwt_required()
+def auth_images_game():
+
+    game_code = request.args.get('game_code',None)
+    player_name = request.args.get('player_name',None)
+    
+    if not game_code or not player_name:
+        return  {"msg":"provide game_code and player_name"},400
+
+    game:Game = games.get(game_code,None)
+
+    if not game_code or not player_name:
+        return  {"msg":"game with game code does not exist"},400
+
+    author_id = 0
+    for author_name in game.author_votes.keys():
+        if author_name == player_name:
+            print(f"author found: {author_name}, {game.deck_id}")
+            author = author_repo.get_by_author_and_deck_id(author_name=author_name,deck_id=game.deck_id)
+            if not author:
+                return {"msg":"internal error - could not find that author"},500
+            else:
+                author_id = author.id
+                break
+    dir = path.join("..","assets","author_images")
+    image_path = path.join(dir,f"{author_id}.png")
+    return send_file(image_path, mimetype='image/png')

@@ -21,8 +21,9 @@ function App() {
   return (
     <TokenContext.Provider value={useToken()}>
       {/* <SetTokenContext.Provider value={setToken}> */}
-      <Navbar />
-      <MyRoutes />
+      <Navbar>
+        <MyRoutes />
+      </Navbar>
       {/* </SetTokenContext.Provider> */}
     </TokenContext.Provider>
   );

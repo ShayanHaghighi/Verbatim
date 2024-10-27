@@ -11,8 +11,9 @@ export function setUpHandlers({ setGameState, setCurrentAccused }: any) {
     setGameState({ state: "waiting" });
   });
 
-  client.on("question-finished", (_) => {
+  client.on("question-finished", (res) => {
     setGameState({ state: "answer" });
+    setCurrentAccused(res.answer);
   });
 
   client.on("start-rebuttal", (res) => {

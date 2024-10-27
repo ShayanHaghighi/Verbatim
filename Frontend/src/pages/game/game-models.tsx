@@ -12,6 +12,7 @@ export interface Player {
   name: string;
   score: number;
   hasAnswered: boolean;
+  scoreIncrease: number;
 }
 
 export interface Vote {

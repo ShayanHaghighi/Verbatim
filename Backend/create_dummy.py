@@ -7,10 +7,18 @@ import datetime
 from psycopg2 import errors
 from werkzeug.security import generate_password_hash
 from datetime import date
+from dotenv import load_dotenv
+import os
 
 from app.models.UserProfile import UserProfile
 db = SQLAlchemy()
 app = Flask(__name__)
+load_dotenv()
+password = os.getenv('PASSWORD')
+db_port = os.getenv('DATABASE_SERVER_PORT')
+db_name = os.getenv('DATABASE_NAME')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://postgres:{password}@localhost:{db_port}/{db_name}"
 db.init_app(app)
 
 

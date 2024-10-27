@@ -20,9 +20,9 @@ export default function Dropdown({
   }
   return (
     <>
-      <div className="container">
-        <div className="head" onClick={toggleDropdown}>
-          <span>{currElement != null && displayFunc(currElement)}</span>
+      <div className="container w-full">
+        <div className="head w-full" onClick={toggleDropdown}>
+          <div>{currElement != null && displayFunc(currElement)}</div>
           <IoIosArrowDropdownCircle
             className={`dropdown-icon ${showing ? "rotated" : ""}`}
           />

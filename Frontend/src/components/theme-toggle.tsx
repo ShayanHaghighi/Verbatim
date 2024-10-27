@@ -2,19 +2,23 @@ import { useEffect, useState } from "react";
 import { FaSun, FaMoon } from "react-icons/fa";
 
 const ThemeToggle = () => {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(
+    sessionStorage.getItem("theme") == "dark"
+  );
 
   useEffect(() => {
     const root = document.documentElement;
 
     if (isDark) {
       root.dataset.theme = "dark";
+      sessionStorage.setItem("theme", "dark");
     } else {
       root.dataset.theme = "light";
+      sessionStorage.setItem("theme", "light");
     }
   }, [isDark]);
   return (
-    <label className="relative items-center cursor-pointer mr-6 hidden md:inline-flex">
+    <label className="relative inline-flex items-center cursor-pointer ">
       <input
         type="checkbox"
         className="sr-only peer"

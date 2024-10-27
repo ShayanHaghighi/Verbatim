@@ -1,0 +1,69 @@
+/* Tailwind CSS styles */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.bg-purple-900 {
+  background-color: #230453;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.relative {
+  position: relative;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.text-6xl {
+  font-size: 4rem;
+}
+
+.text-purple-300 {
+  color: #d8b4fe;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.my-6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}

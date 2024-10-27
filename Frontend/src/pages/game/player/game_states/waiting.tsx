@@ -1,5 +1,7 @@
+import WaitingScreen from "../../../../components/waiting-screen";
+
 function Player_Waiting() {
-  return <>you are in the waiting area</>;
+  return <WaitingScreen />;
 }
 
 export default Player_Waiting;

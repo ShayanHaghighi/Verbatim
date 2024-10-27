@@ -1,12 +1,14 @@
 import { useState, ChangeEvent, FormEvent, useEffect, useContext } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
+import "../../../node_modules/font-awesome/css/font-awesome.min.css";
 
 import { useNavigate } from "react-router-dom";
 // import "./styles.css";
 import ErrorBar from "../../components/error-bar";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { TokenContext } from "../../App";
+import { MdEmail, MdLock, MdOutlineEmail } from "react-icons/md";
 
 interface FormData {
   email: string;
@@ -20,6 +22,12 @@ function LoginForm() {
   const [isError, setisError] = useState("");
   const [showingPassword, setShowingPassword] = useState(false);
   const { token, removeToken, setToken } = useContext(TokenContext);
+  const [selectedId, setSelectedId] = useState<string | undefined>("");
+  document.addEventListener("click", updateSelectedId);
+
+  function updateSelectedId() {
+    setSelectedId(document.activeElement?.id);
+  }
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -78,78 +86,90 @@ function LoginForm() {
       <ErrorBar error={isError} setError={setisError} />
       <form
         onSubmit={handleSubmit}
-        className="mb-48 flex items-center flex-col justify-center w-2/3 max-w-4xl p-6"
+        className="flex items-center flex-col justify-center w-2/3 max-w-4xl p-6 font-josefin sm:mt-0 mt-2 h-full"
       >
-        <div className="flex flex-col items-start justify-center w-full m-4">
-          <label
-            className="mb-4 text-2xl sm:text-4xl font-bold text-blk"
-            htmlFor="email"
+        <div className="text-6xl font-bold text-darkpurple">Log in</div>
+        <span className="mt-8 text-sm xl:text-lg text-blk">
+          Don't have an account?{" "}
+          <span
+            className="cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out"
+            onClick={() => navigate("/signup")}
           >
-            Email Address
-          </label>
-          <input
-            className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht text-md  text-blk"
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="example@gmail.com"
-          />
+            {" "}
+            Sign in
+          </span>
+        </span>
+        <div className="flex flex-col max-w-[40rem] items-start justify-center w-full m-4">
+          <div className="relative flex items-center w-full">
+            {!formData.email && selectedId != "email" && (
+              <>
+                <MdOutlineEmail className="absolute left-3 text-gray-400 w-5 h-auto text-zinc-400 pointer-events-none" />
+                <span className="absolute left-11 text-zinc-400 pointer-events-none">
+                  Email
+                </span>
+              </>
+            )}
+            <input
+              className="w-full p-4 bg-zinc-200 rounded-sm h-16 text-md  text-black"
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              onFocus={updateSelectedId}
+              placeholder=""
+            />
+          </div>
         </div>
-        <div className="flex flex-col items-start justify-center w-full m-4">
+        <div className="flex flex-col max-w-[40rem] items-start justify-center w-full m-4">
           <div className="w-full flex flex-row justify-between items-center">
-            <label
-              className="mb-4 text-2xl sm:text-4xl  font-bold text-blk"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <span className="text-sm ml-2 pb-4 sm:p-0 cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out text-end">
+            <span className="text-sm pb-4 sm:p-0 cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out w-full text-end">
               Forgot password?
             </span>
           </div>
-          <div className="w-full relative">
-            <input
-              className="w-full p-4 border border-gray-400 rounded-2xl h-16 bg-wht text-md sm:text-xl text-blk"
-              type={showingPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="**********"
-            />
+          <div className="w-full  relative">
+            <div className="relative flex items-center w-full">
+              {!formData.password && selectedId != "password" && (
+                <>
+                  <MdLock className="absolute left-3 text-gray-400 pointer-events-none w-5 h-auto text-zinc-400" />
+                  <span className="absolute left-11 text-zinc-400 pointer-events-none">
+                    Password
+                  </span>
+                </>
+              )}
+              <input
+                className="w-full  p-4 bg-zinc-200 rounded-sm h-16 text-md  text-black"
+                type={showingPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onClick={updateSelectedId}
+                onChange={handleChange}
+              />
+            </div>
             {showingPassword ? (
               <FaEyeSlash
                 onClick={() => setShowingPassword(!showingPassword)}
-                className="absolute top-1/2 right-6 w-6 h-auto -translate-y-2/4 select-none cursor-pointer text-blk"
+                className="absolute top-1/2 right-6 w-6 h-auto -translate-y-2/4 select-none cursor-pointer text-black"
               />
             ) : (
               <FaEye
                 onClick={() => setShowingPassword(!showingPassword)}
-                className="absolute top-1/2 right-6 w-6 h-auto -translate-y-2/4 select-none cursor-pointer text-blk"
+                className="absolute top-1/2 right-6 w-6 h-auto -translate-y-2/4 select-none cursor-pointer text-black"
               />
             )}
           </div>
         </div>
-        <div className="flex flex-col justify-center items-center  text-center">
-          <span className="mt-8 text-lg text-blk">
-            Don't have an account?{" "}
-            <span
-              className="cursor-pointer font-bold text-purple hover:text-darkpurple transition-all duration-200 ease-in-out"
-              onClick={() => navigate("/signup")}
-            >
-              {" "}
-              Sign in
-            </span>
-          </span>
-
-          <button className="btn-purple select-none" type="submit">
-            Log in
+        <div className="flex flex-col justify-center items-center text-center">
+          <button
+            className="btn-purple text-[100%] w-1/2 min-w-52 bg-darkpurple hover:bg-purple mt-[9vh]"
+            type="submit"
+          >
+            LOG IN
           </button>
           <span className="font-sm mt-4 text-blk">
             By continuing, you agree to our{" "}
-            <span className=" text-purple cursor-pointer">
+            <span className=" text-purple  cursor-pointer">
               Terms of Service
             </span>{" "}
             and{" "}

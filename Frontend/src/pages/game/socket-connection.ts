@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
+import { backendURL } from "../../constants";
 
-const client: Socket = io("http://127.0.0.1:5000", {
+const client: Socket = io(backendURL, {
   transports: ["websocket"],
 });
 

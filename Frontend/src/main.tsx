@@ -5,12 +5,12 @@ import App from "./App.tsx";
 import axios from "axios";
 import "./global.css";
 import "./index.css";
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "http://192.168.0.47:5000";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App data-theme="dark" />
+      <App data-theme="light" />
     </BrowserRouter>
   </React.StrictMode>
 );

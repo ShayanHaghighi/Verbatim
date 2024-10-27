@@ -10,6 +10,7 @@ import HostResults from "./game_states/results";
 import { Vote, gameStates, Player, Question } from "../game-models";
 
 import client from "../socket-connection";
+import ConfirmationModal from "../../../components/confirm-modal";
 
 interface FormData {
   numQuestions: number;
@@ -23,12 +24,17 @@ function Game_Owner() {
   const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [currentVotes, setCurrentVotes] = useState<Vote[]>([]);
+  const [currentAccused, setCurrentAccused] = useState("");
   const [authorVotes, setAuthorVotes] = useState({});
+  const [timeLimit, setTimeLimit] = useState(60);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [questionNum, setQuestionNum] = useState("0/1");
   const [formData, setFormData] = useState<FormData>({
     numQuestions: 1,
     password: "",
     deck: null,
   });
+
   const navigate = useNavigate();
   useEffect(() => {
     if (sessionStorage.getItem("game_code")) {
@@ -49,6 +55,12 @@ function Game_Owner() {
     });
     setPlayersJoined([]);
   }
+  function endGame() {
+    client.emit("end-game", {
+      game_code: gameCode,
+      game_token: sessionStorage.getItem("game_token"),
+    });
+  }
 
   function start_game() {
     client.emit("start-game", {
@@ -62,6 +74,10 @@ function Game_Owner() {
       console.log("Connected to server");
     });
 
+    client.on("current-game-info", (res) => {
+      setQuestionNum(res.question_no);
+    });
+
     client.on("update", (data) => {
       setGameCode(sessionStorage.getItem("game_code"));
       setGameState({ state: data.state });
@@ -70,7 +86,12 @@ function Game_Owner() {
           // TODO change players object to incorporate 'hasAnswered'
           let temp: Player[] = [];
           data.players.forEach((player_name: any) => {
-            temp.push({ name: player_name, score: 0, hasAnswered: false });
+            temp.push({
+              name: player_name,
+              score: 0,
+              hasAnswered: false,
+              scoreIncrease: 0,
+            });
           });
           setPlayersJoined(temp);
           break;
@@ -112,7 +133,24 @@ function Game_Owner() {
       console.log("Update to players:", data.players);
       let temp: Player[] = [];
       data.players.forEach((player_name: any) => {
-        temp.push({ name: player_name, score: 0, hasAnswered: false });
+        temp.push({
+          name: player_name,
+          score: 0,
+          hasAnswered: false,
+          scoreIncrease: 0,
+        });
+      });
+      setPlayersJoined(temp);
+    });
+    client.on("updated-players", (res) => {
+      let temp: Player[] = [];
+      res.forEach((player: any) => {
+        temp.push({
+          name: player.name,
+          score: player.score,
+          hasAnswered: false,
+          scoreIncrease: player.score_increase,
+        });
       });
       setPlayersJoined(temp);
     });
@@ -129,6 +167,7 @@ function Game_Owner() {
       setCurrentQuestion({ question: res.question, options: res.options });
       setGameState({ state: "question" });
       sessionStorage.setItem("state", "question");
+      setTimeLimit(res.time_limit);
       setPlayersJoined((prevPlayers) => {
         return prevPlayers.map((player: Player) => ({
           ...player,
@@ -146,7 +185,8 @@ function Game_Owner() {
 
     client.on("player-scores", (res) => {
       console.log(res);
-      setPlayersJoined(res);
+      setPlayersJoined(res.scores);
+      setCurrentAccused(res.answer);
       setGameState({ state: "answer" });
       sessionStorage.setItem("state", "answer");
     });
@@ -189,16 +229,8 @@ function Game_Owner() {
     };
   }, [client]);
 
-  function endGame() {
-    client.emit("end-game", {
-      game_code: gameCode,
-      game_token: sessionStorage.getItem("game_token"),
-    });
-  }
-
   return (
     <>
-      <button onClick={endGame}>End Game</button>
       {gameState.state == "waiting" && (
         <Host_Create_Game
           create_game={create_game}
@@ -214,10 +246,17 @@ function Game_Owner() {
           question={currentQuestion}
           game_code={gameCode}
           players={playersJoined}
+          timeLimit={timeLimit}
+          questionNum={questionNum}
         ></Host_Question>
       )}
       {gameState.state == "answer" && (
-        <HostAnswer gameCode={gameCode} players={playersJoined}></HostAnswer>
+        <HostAnswer
+          gameCode={gameCode}
+          players={playersJoined}
+          currentAccused={currentAccused}
+          questionNum={questionNum}
+        ></HostAnswer>
       )}
       {gameState.state == "rebuttal" && (
         <HostRebuttal
@@ -232,6 +271,12 @@ function Game_Owner() {
           authorVotes={authorVotes}
         ></HostResults>
       )}
+      <button onClick={() => setIsModalOpen(true)}>exit</button>
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={endGame}
+      />
     </>
   );
 }

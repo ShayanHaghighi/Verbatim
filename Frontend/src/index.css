@@ -4,16 +4,21 @@
 
 @layer base {
   :root {
-    --color-bkg: 212 208 255;
+    --color-bkg: 255 255 255;
     --color-notbkg: 18 6 45;
     --color-blk: 0 0 0;
     --color-wht: 255 255 255;
     --color-purple: 122 28 249;
-    --color-darkpurple: 36 0 95;
-    --color-accent1: 100 75 200;
-    --color-accent2: 145 118 255;
+    --color-darkpurple: 75 54 158;
+    --color-lightpurple: 172 158 231;
+    --color-accent1: 67 13 151;
+    --color-accent2: 132 57 246;
     --color-gray: 235 235 235;
     --color-whtpp: 255 255 255;
+    --color-whtdarkpp: 255 255 255;
+    --color-ppwht: 75 54 158;
+    --color-optionbg: 212 208 255;
+    --color-optionlight: 168 168 168;
   }
   :root[data-theme="dark"] {
     --color-bkg: 18 6 45;
@@ -22,9 +27,13 @@
     --color-wht: 0 0 0;
     --color-purple: 208 178 255;
     --color-darkpurple: 135 90 209;
+    --color-lightpurple: 181 163 255;
     --color-accent1: 100 75 200;
     --color-accent2: 145 118 255;
     --color-gray: 55 43 80;
-    --color-whtpp: 26 17 49;
+    --color-whtpp: 145 118 255;
+    --color-whtdarkpp: 55 43 79;
+    --color-ppwht: 255 255 255;
+    --color-optionbg: 26 17 49;
   }
 }

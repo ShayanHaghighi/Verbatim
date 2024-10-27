@@ -38,7 +38,7 @@ export default function MyRoutes() {
         <Route path="/deck/create" element={<Create_Deck />} />
         <Route path="/game/host" element={<Game_Owner />} />
         <Route path="/game/play" element={<Game_Player />} />
-        <Route path="/login" element={<LoginForm setToken={setToken} />} />
+        <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignUpForm setToken={setToken} />} />
         <Route
           path="/deck/create"
