@@ -2,6 +2,8 @@ import { Question } from "../game-player";
 import client from "../../socket-connection";
 import { useEffect, useState } from "react";
 import CountdownTimerExternal from "../../../../components/TimerExternal";
+import ResultsWaitingScreen from "../../../../components/waiting-screen-2";
+import WaitingScreen2 from "../../../../components/waiting-screen-3";
 
 export function setUpQuestionHandlers({
   setAnswerCorrect,
@@ -78,7 +80,7 @@ function PlayerQuestion({
     <>
       <div className="w-full h-full bg-accent2">
         {hasAnswered ? (
-          <span>answered question</span>
+          <WaitingScreen2 />
         ) : (
           <>
             <div

@@ -203,9 +203,9 @@ function Host_Question({
                     <img
                       src="/icons/positive-vote.png"
                       alt="positive vote icon"
-                      className={
-                        player.hasAnswered ? "vote-after" : "vote-before"
-                      }
+                      className={`
+                        ${player.hasAnswered ? "vote-after" : "vote-before"}
+                      `}
                     />
                     <span className="text-center text-white text-bold text-xl mt-2">
                       {player.name}

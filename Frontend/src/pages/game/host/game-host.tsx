@@ -142,18 +142,20 @@ function Game_Owner() {
       });
       setPlayersJoined(temp);
     });
-    client.on("updated-players", (res) => {
-      let temp: Player[] = [];
-      res.forEach((player: any) => {
-        temp.push({
-          name: player.name,
-          score: player.score,
-          hasAnswered: false,
-          scoreIncrease: player.score_increase,
-        });
-      });
-      setPlayersJoined(temp);
-    });
+    // client.on("updated-players", (res) => {
+    //   let temp: Player[] = [];
+    //   console.log("updated-players");
+    //   console.log(res);
+    //   res.forEach((player: any) => {
+    //     temp.push({
+    //       name: player.name,
+    //       score: player.score,
+    //       hasAnswered: false,
+    //       scoreIncrease: player.score_increase,
+    //     });
+    //   });
+    //   setPlayersJoined(temp);
+    // });
 
     client.on("connect_error", (error) => {
       console.error("Connection error:", error);
@@ -184,9 +186,24 @@ function Game_Owner() {
     });
 
     client.on("player-scores", (res) => {
+      console.log("player-scores");
       console.log(res);
-      setPlayersJoined(res.scores);
+
       setCurrentAccused(res.answer);
+
+      let temp: Player[] = [];
+      console.log("updated-players");
+      console.log(res);
+      res.scores.forEach((player: any) => {
+        temp.push({
+          name: player.name,
+          score: player.score,
+          hasAnswered: false,
+          scoreIncrease: player.score_increase,
+        });
+      });
+      setPlayersJoined(temp);
+
       setGameState({ state: "answer" });
       sessionStorage.setItem("state", "answer");
     });
@@ -271,7 +288,16 @@ function Game_Owner() {
           authorVotes={authorVotes}
         ></HostResults>
       )}
-      <button onClick={() => setIsModalOpen(true)}>exit</button>
+      <div
+        className={`w-full ${gameState.state == "waiting" ? "bg-optionbg" : "bg-accent2"}`}
+      >
+        <button
+          className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 rounded-tr-full"
+          onClick={() => setIsModalOpen(true)}
+        >
+          exit
+        </button>
+      </div>
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

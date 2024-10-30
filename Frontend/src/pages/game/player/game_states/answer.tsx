@@ -15,7 +15,6 @@ export default function PlayerAnswer({
   score: number;
   currentAccused: string | null;
 }) {
-  currentAccused = "Bobby";
   const [scoreIncrease, setScoreIncrease] = useState(0);
   const gradientStyle = {
     background: `linear-gradient(to right, #22c55e ${barProgress() - 5}%, #230453 ${barProgress() + 5}%, #230453 100%)`,

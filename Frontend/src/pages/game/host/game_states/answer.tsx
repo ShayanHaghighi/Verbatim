@@ -1,11 +1,9 @@
 import client from "../../socket-connection";
 import { Player } from "../../game-models";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { backendURL } from "../../../../constants";
+import { AnimatePresence, motion } from "framer-motion";
 import Accused from "./sub-states/accused";
 import RunningResults from "./sub-states/running-results";
-import { div } from "framer-motion/client";
 
 interface props {
   gameCode: string | null;
@@ -20,6 +18,16 @@ export default function HostAnswer({
   currentAccused,
   questionNum,
 }: props) {
+  // players = [
+  //   { name: "billy", score: 1273, scoreIncrease: 561, hasAnswered: false },
+  //   { name: "barry", score: 1205, scoreIncrease: 700, hasAnswered: false },
+  //   { name: "benny", score: 1315, scoreIncrease: 1090, hasAnswered: false },
+  //   { name: "bobby", score: 1298, scoreIncrease: 901, hasAnswered: false },
+  //   { name: "baldy", score: 900, scoreIncrease: 0, hasAnswered: false },
+  //   { name: "john", score: 1100, scoreIncrease: 811, hasAnswered: false },
+  // ];
+  const [showFirstDiv, setShowFirstDiv] = useState(true);
+
   function startRebuttal() {
     client.emit("start-rebuttal", {
       game_code: gameCode,
@@ -40,9 +48,14 @@ export default function HostAnswer({
     client.emit("current-game-info", {
       game_code: sessionStorage.getItem("game_code"),
     });
-    client.emit("get-players", {
-      game_code: sessionStorage.getItem("game_code"),
-    });
+    const timer = setTimeout(() => {
+      setShowFirstDiv(false);
+    }, 3000); // Show the first div for 3 seconds
+
+    return () => clearTimeout(timer);
+    // client.emit("get-players", {
+    //   game_code: sessionStorage.getItem("game_code"),
+    // });
   }, []);
 
   return (
@@ -90,29 +103,37 @@ export default function HostAnswer({
             <div className="text-white">{questionNum}</div>
           </div>
         </div>
-        <div className="flex items-center justify-center text-[5vh] text-white pb-10">
+        <div className="flex font-extrabold items-center justify-center text-[5vh] text-white pb-10">
           It was:
         </div>
       </div>
-      {/* <Accused currentAccused={currentAccused} /> */}
-      <div className="w-full h-full flex flex-col sm:flex-row justify-center items-center">
-        <div className="hidden sm:flex justify-start h-full w-fit opacity-0  mb-4 mx-4">
-          <button className="btn-purple p-8 flex justify-center items-center w-fit">
-            {"Next ->"}
-          </button>
-        </div>
-        <div className="bg-slate-400 box-border w-[80%] h-[80%] max-w-[70rem] mt-4 sm:mt-0"></div>
-        <div className="flex justify-start sm:h-full sm:w-fit mb-4 mx-4">
-          <button
-            onClick={startRebuttal}
-            className="btn-purple p-8 flex justify-center items-center w-fit"
-          >
-            {"Next"}
-          </button>
-        </div>
-        {players.map((player) => (
-          <div>{player.name}</div>
-        ))}
+      <div className="relative w-full h-full flex items-center justify-center">
+        <AnimatePresence>
+          {showFirstDiv ? (
+            <motion.div
+              key="first"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 1 }}
+              className="absolute w-full h-full"
+            >
+              <Accused currentAccused={currentAccused} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="second"
+              // initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 1 }}
+              className="absolute w-full h-full"
+            >
+              <RunningResults startRebuttal={startRebuttal} players={players} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

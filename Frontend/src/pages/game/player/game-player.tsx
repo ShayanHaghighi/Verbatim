@@ -7,6 +7,7 @@ import PlayerAnswer from "./game_states/answer";
 import PlayerRebuttal from "./game_states/rebuttal";
 import Player_Join from "./game_states/joining";
 import { useNavigate } from "react-router-dom";
+import ConfirmationModal from "../../../components/confirm-modal";
 
 interface FormData {
   gameCode: string;
@@ -31,6 +32,7 @@ function Game_Player() {
   const [myPlayerName, setMyPlayerName] = useState<string>("");
   const [timeLimit, setTimeLimit] = useState(60);
   const [questionNum, setQuestionNum] = useState("0/1");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [score, setScore] = useState(0);
 
   const navigate = useNavigate();
@@ -112,7 +114,21 @@ function Game_Player() {
           myName={myPlayerName}
         ></PlayerRebuttal>
       )}
-      <button onClick={leaveGame}>exit</button>
+      <div
+        className={`w-full ${gameState.state == "joining" ? "bg-optionbg" : gameState.state == "waiting" ? "bg-[#220f4e]" : "bg-accent2"}`}
+      >
+        <button
+          className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 rounded-tr-full"
+          onClick={() => setIsModalOpen(true)}
+        >
+          exit
+        </button>
+      </div>
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={leaveGame}
+      />
     </>
   );
 }

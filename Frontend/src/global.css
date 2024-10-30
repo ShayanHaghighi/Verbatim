@@ -47,6 +47,19 @@ body,
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
 }
 
+.shadow-neon {
+  box-shadow:
+    0 0 15px #6a0dad,
+    0 0 30px #ff1493,
+    inset 0 0 15px #ff1493;
+}
+.shadow-glow {
+  box-shadow:
+    0 0 10px #8e44ad,
+    0 0 20px #8e44ad,
+    inset 0 0 10px #8e44ad;
+}
+
 .vote-before {
   width: 0rem /* 32px */;
   height: 0rem /* 32px */;
@@ -112,7 +125,7 @@ body,
   height: 100%;
   height: -moz-available; /* WebKit-based browsers will ignore this. */
   height: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
-  height: fill-available;
+  height: stretch;
 }
 
 .btn-purple {

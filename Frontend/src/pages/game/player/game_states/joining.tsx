@@ -146,11 +146,13 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
             <div className="flex flex-col md:flex-row p-[1vw] justify-between items-center">
               <div className="flex flex-row mt-4 h-full items-center justify-center">
                 <TbCardsFilled className="size-8 text-[#7964A3]" />
-                <div className="ml-2 text-3xl sm:text-3xl">Game Code:</div>
+                <div className="ml-2 text-3xl sm:text-3xl font-bold">
+                  Game Code:
+                </div>
               </div>
               <div className="flex-1 max-w-[30rem] p-2">
                 <input
-                  className={`${hasEnteredGameCode ? "pointer-events-none bg-zinc-500 text-zinc-200 mild-shadow" : "bg-black text-white"} font-rubik h-20 p-4 rounded-md  text-[1.5em] sm:text-[2em] w-full text-start md:text-center`}
+                  className={`${hasEnteredGameCode ? "pointer-events-none bg-zinc-500 text-zinc-200 mild-shadow" : "bg-black text-white"} font-rubik h-20 p-4 rounded-md  text-[1.5em] sm:text-[2em] w-full text-start md:text-center mt-4`}
                   type="text"
                   id="gameCode"
                   name="gameCode"
@@ -181,7 +183,7 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
                   <label className="flex w-full flex-row justify-between items-center">
                     <span className="text-2xl">Select Name:</span>
                     <select
-                      className="text-white bg-black w-1/4 p-4 rounded-lg"
+                      className="text-white bg-black w-1/4 min-w-fit p-4 rounded-lg"
                       value={isCustomName ? "Custom" : formData.name}
                       onChange={handleNameChange}
                     >
