@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Player } from "../../../game-models";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
-import { useSpring, animated } from "@react-spring/web";
-import AnimatedNumber from "../../../../../components/animated-number";
+import AnimatedNumber from "../../../../../components/game/animated-number";
 
 export default function RunningResults({
   startRebuttal,

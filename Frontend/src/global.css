@@ -228,3 +228,27 @@ body,
 .text-dynamic {
   font-size: calc(2 * 100%);
 }
+
+.animate-float {
+  -webkit-animation: action 1s infinite alternate;
+  animation: Float 1s ease-in-out infinite;
+}
+
+@-webkit-keyframes action {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100px);
+  }
+}
+
+@keyframes Float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-100px);
+  }
+}

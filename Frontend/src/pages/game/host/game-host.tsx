@@ -10,7 +10,7 @@ import HostResults from "./game_states/results";
 import { Vote, gameStates, Player, Question } from "../game-models";
 
 import client from "../socket-connection";
-import ConfirmationModal from "../../../components/confirm-modal";
+import ConfirmationModal from "../../../components/game/confirm-modal";
 
 interface FormData {
   numQuestions: number;
@@ -21,7 +21,7 @@ interface FormData {
 function Game_Owner() {
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [playersJoined, setPlayersJoined] = useState<Player[]>([]);
-  const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
+  const [gameState, setGameState] = useState<gameStates>({ state: "rebuttal" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [currentVotes, setCurrentVotes] = useState<Vote[]>([]);
   const [currentAccused, setCurrentAccused] = useState("");
@@ -248,61 +248,61 @@ function Game_Owner() {
 
   return (
     <>
-      {gameState.state == "waiting" && (
-        <Host_Create_Game
-          create_game={create_game}
-          start_game={start_game}
-          gameCode={gameCode}
-          playersJoined={playersJoined}
-          formData={formData}
-          setFormData={setFormData}
-        ></Host_Create_Game>
-      )}
-      {gameState.state == "question" && (
-        <Host_Question
-          question={currentQuestion}
-          game_code={gameCode}
-          players={playersJoined}
-          timeLimit={timeLimit}
-          questionNum={questionNum}
-        ></Host_Question>
-      )}
-      {gameState.state == "answer" && (
-        <HostAnswer
-          gameCode={gameCode}
-          players={playersJoined}
-          currentAccused={currentAccused}
-          questionNum={questionNum}
-        ></HostAnswer>
-      )}
-      {gameState.state == "rebuttal" && (
-        <HostRebuttal
-          gameCode={gameCode}
-          question={currentQuestion}
-          currentVotes={currentVotes}
-        ></HostRebuttal>
-      )}
-      {gameState.state == "results" && (
-        <HostResults
-          players={playersJoined}
-          authorVotes={authorVotes}
-        ></HostResults>
-      )}
-      <div
-        className={`w-full ${gameState.state == "waiting" ? "bg-optionbg" : "bg-accent2"}`}
-      >
-        <button
-          className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 rounded-tr-full"
-          onClick={() => setIsModalOpen(true)}
-        >
-          exit
-        </button>
+      <div className="h-full w-full relative">
+        {gameState.state == "waiting" && (
+          <Host_Create_Game
+            create_game={create_game}
+            start_game={start_game}
+            gameCode={gameCode}
+            playersJoined={playersJoined}
+            formData={formData}
+            setFormData={setFormData}
+          ></Host_Create_Game>
+        )}
+        {gameState.state == "question" && (
+          <Host_Question
+            question={currentQuestion}
+            game_code={gameCode}
+            players={playersJoined}
+            timeLimit={timeLimit}
+            questionNum={questionNum}
+          ></Host_Question>
+        )}
+        {gameState.state == "answer" && (
+          <HostAnswer
+            gameCode={gameCode}
+            players={playersJoined}
+            currentAccused={currentAccused}
+            questionNum={questionNum}
+          ></HostAnswer>
+        )}
+        {gameState.state == "rebuttal" && (
+          <HostRebuttal
+            gameCode={gameCode}
+            question={currentQuestion}
+            currentVotes={currentVotes}
+          ></HostRebuttal>
+        )}
+        {gameState.state == "results" && (
+          <HostResults
+            players={playersJoined}
+            authorVotes={authorVotes}
+          ></HostResults>
+        )}
+        <div className={`w-full bg-transparent absolute bottom-0`}>
+          <button
+            className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 rounded-tr-full"
+            onClick={() => setIsModalOpen(true)}
+          >
+            exit
+          </button>
+        </div>
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={endGame}
+        />
       </div>
-      <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={endGame}
-      />
     </>
   );
 }

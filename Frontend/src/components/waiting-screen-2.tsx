@@ -79,7 +79,6 @@ const ResultsWaitingScreen: React.FC<ResultsWaitingScreenProps> = ({
       >
         {message}
       </motion.div>
-      <Loader />
     </div>
   );
 };

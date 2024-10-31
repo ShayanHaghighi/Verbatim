@@ -7,7 +7,7 @@ import PlayerAnswer from "./game_states/answer";
 import PlayerRebuttal from "./game_states/rebuttal";
 import Player_Join from "./game_states/joining";
 import { useNavigate } from "react-router-dom";
-import ConfirmationModal from "../../../components/confirm-modal";
+import ConfirmationModal from "../../../components/game/confirm-modal";
 
 interface FormData {
   gameCode: string;

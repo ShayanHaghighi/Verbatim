@@ -7,7 +7,7 @@ import client from "../../socket-connection";
 import { TbCardsFilled } from "react-icons/tb";
 import { FaListOl } from "react-icons/fa";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
-import ConfirmationModal from "../../../../components/confirm-modal";
+import ConfirmationModal from "../../../../components/game/confirm-modal";
 import { backendURL } from "../../../../constants";
 
 interface FormData {

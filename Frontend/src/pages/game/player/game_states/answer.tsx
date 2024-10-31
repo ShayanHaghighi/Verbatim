@@ -3,6 +3,8 @@ import CountdownTimerExternal from "../../../../components/TimerExternal";
 import client from "../../socket-connection";
 import { backendURL } from "../../../../constants";
 import { motion } from "framer-motion";
+import ProgressBar from "../../../../components/game/progress-bar";
+import ScoreComponent from "../../../../components/game/score-component";
 
 export default function PlayerAnswer({
   isAnswerCorrect,
@@ -16,14 +18,6 @@ export default function PlayerAnswer({
   currentAccused: string | null;
 }) {
   const [scoreIncrease, setScoreIncrease] = useState(0);
-  const gradientStyle = {
-    background: `linear-gradient(to right, #22c55e ${barProgress() - 5}%, #230453 ${barProgress() + 5}%, #230453 100%)`,
-  };
-  function barProgress() {
-    const fromNum = Number(questionNum.split("/")[0]);
-    const toNum = Number(questionNum.split("/")[1]);
-    return Math.round((fromNum / toNum) * 100);
-  }
 
   const objects = [
     { id: 2, x: -250, y: -175, rotate: 45 },
@@ -62,25 +56,8 @@ export default function PlayerAnswer({
           }}
         >
           <div className="flex h-24 flex-row justify-between p-4">
-            <div className="flex items-start">
-              <div className="flex flex-row justify-center py-2 px-2 bg-accent2 text-white shadow-lg rounded-full w-28 min-w-fit">
-                <img
-                  src={"/icons/checkpoint.png"}
-                  alt="checkpoint image"
-                  className="size-6 mr-1"
-                />
-                <div>{score} pts</div>
-              </div>
-            </div>
-            <div className="sm:flex hidden items-end flex-1 px-10">
-              <div className="flex flex-col w-full items-center">
-                <div
-                  className={` h-2 w-full rounded-full`}
-                  style={gradientStyle}
-                ></div>
-                <div>{questionNum}</div>
-              </div>
-            </div>
+            <ScoreComponent score={score} />
+            <ProgressBar questionNum={questionNum} />
             <div>
               <div className="flex flex-row justify-center py-2 px-4 text-white shadow-lg rounded-full w-28 bg-accent2">
                 <img
