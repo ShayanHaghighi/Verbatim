@@ -1,4 +1,4 @@
-import client from "../../socket-connection";
+import client, { endGame } from "../../socket-connection";
 import { Player, Question } from "../../game-models";
 
 // function Host_Question({ question, game_code, players }: props) {
@@ -34,6 +34,7 @@ import { Player, Question } from "../../game-models";
 import { useEffect, useState } from "react";
 import CountdownTimerExternal from "../../../../components/TimerExternal";
 import { backendURL } from "../../../../constants";
+import ExitButton from "../../../../components/game/exit-button";
 
 export function setUpQuestionHandlers({
   setAnswerCorrect,
@@ -118,7 +119,7 @@ function Host_Question({
 
   return (
     <>
-      <div className="w-full h-full bg-accent2">
+      <div className="w-full flex flex-col justify-between items-center h-full bg-accent2">
         {hasAnswered ? (
           <span>answered question</span>
         ) : (
@@ -221,6 +222,8 @@ function Host_Question({
             </div>
           </>
         )}
+          <ExitButton onConfirm={endGame}/>
+
       </div>
     </>
   );

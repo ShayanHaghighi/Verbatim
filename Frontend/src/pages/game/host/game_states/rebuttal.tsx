@@ -1,8 +1,9 @@
-import client from "../../socket-connection";
+import client, { endGame } from "../../socket-connection";
 import { Question, Vote } from "../../game-models";
 import { useState } from "react";
 import CountdownTimerExternal from "../../../../components/TimerExternal";
 import ProgressBar from "../../../../components/game/progress-bar";
+import ExitButton from "../../../../components/game/exit-button";
 
 interface props {
   gameCode: string | null;
@@ -50,7 +51,7 @@ export default function HostRebuttal({
     //   <button onClick={nextQuestion}>Next Question</button>
     // </>
     <>
-      <div className="w-full h-full relative overflow-hidden">
+      <div className="w-full h-full relative">
         <div
           className="bg-accent1 w-full flex flex-col rounded-b-[100%] shadow-inner absolute"
           style={{
@@ -101,16 +102,17 @@ export default function HostRebuttal({
             Who said:
           </div>
         </div>
-        <div className="relative w-fit h-[50vh] scale-[2] translate-y-1/2 translate-x-1/2 overflow-hidden">
+        <div className="relative  w-full h-full">
           <img
             src="/images/court.png"
-            className="w-full h-full object-cover"
+            className="absolute  right-0  object-cover"
           ></img>
           <img
             src="/author_images/Billy.png"
-            className="size-8 absolute left-12 bottom-20"
+            className="size-8 absolute left-12 bottom-20 animate-float"
           />
         </div>
+        <ExitButton onConfirm={endGame}/>
       </div>
     </>
   );

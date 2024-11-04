@@ -1,8 +1,9 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import client from "../../socket-connection";
+import client, { leaveGame } from "../../socket-connection";
 import { TbCardsFilled } from "react-icons/tb";
 import { FaListOl } from "react-icons/fa";
 import GameCodeInput from "../../../../components/code-input";
+import ExitButton from "../../../../components/game/exit-button";
 
 interface FormData {
   gameCode: string;
@@ -138,8 +139,8 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
       </form> */}
 
       <>
-        <div className="size-full flex items-start justify-center bg-optionbg">
-          <div className="bg-whtdarkpp text-blk w-[90%] md:w-[80%] max-w-[60rem] h-fit mt-12 rounded-[2vh] p-10">
+        <div className="w-full h-auto flex flex-col items-center justify-between bg-optionbg">
+          <div className="bg-whtdarkpp text-blk w-[90%] md:w-[80%] max-w-[60rem] h-fit mt-12 rounded-[2vh] p-10 mb-6">
             <div className="text-[3em] font-semibold">Options</div>
             <div className="bg-[#A8A8A8] w-full h-[2px]"></div>
 
@@ -221,7 +222,7 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
                 </div>
                 <div className="w-full flex justify-end p-4 ">
                   <button
-                    className="btn-purple w-1/2"
+                    className="btn-purple w-1/2 min-w-fit px-4"
                     onClick={() => {
                       join_game(formData.name, formData.gameCode);
                     }}
@@ -232,6 +233,7 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
               </div>
             )}
           </div>
+          <ExitButton onConfirm={leaveGame}/>
         </div>
       </>
     </>

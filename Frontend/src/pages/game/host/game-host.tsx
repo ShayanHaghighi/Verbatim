@@ -21,7 +21,7 @@ interface FormData {
 function Game_Owner() {
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [playersJoined, setPlayersJoined] = useState<Player[]>([]);
-  const [gameState, setGameState] = useState<gameStates>({ state: "rebuttal" });
+  const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [currentVotes, setCurrentVotes] = useState<Vote[]>([]);
   const [currentAccused, setCurrentAccused] = useState("");
@@ -55,12 +55,7 @@ function Game_Owner() {
     });
     setPlayersJoined([]);
   }
-  function endGame() {
-    client.emit("end-game", {
-      game_code: gameCode,
-      game_token: sessionStorage.getItem("game_token"),
-    });
-  }
+
 
   function start_game() {
     client.emit("start-game", {
@@ -248,7 +243,7 @@ function Game_Owner() {
 
   return (
     <>
-      <div className="h-full w-full relative">
+      {/* <div className="h-full w-full"> */}
         {gameState.state == "waiting" && (
           <Host_Create_Game
             create_game={create_game}
@@ -289,20 +284,8 @@ function Game_Owner() {
             authorVotes={authorVotes}
           ></HostResults>
         )}
-        <div className={`w-full bg-transparent absolute bottom-0`}>
-          <button
-            className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 rounded-tr-full"
-            onClick={() => setIsModalOpen(true)}
-          >
-            exit
-          </button>
-        </div>
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onConfirm={endGame}
-        />
-      </div>
+        
+      {/* </div> */}
     </>
   );
 }

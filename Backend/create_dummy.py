@@ -18,7 +18,7 @@ password = os.getenv('PASSWORD')
 db_port = os.getenv('DATABASE_SERVER_PORT')
 db_name = os.getenv('DATABASE_NAME')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://postgres:{password}@localhost:{db_port}/{db_name}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://shayan:{password}@localhost:{db_port}/{db_name}"
 db.init_app(app)
 
 
@@ -94,17 +94,34 @@ with app.app_context():
     db.create_all()
 
 
-    user_ben = UserProfile(username="Ben",email="b@b.com",password_hash=generate_password_hash("1234"))
-    db.session.add(user_ben)
+    # user_ben = UserProfile(username="Ben",email="b@b.com",password_hash=generate_password_hash("1234"))
+    # db.session.add(user_ben)
 
-    user_bob = UserProfile(username="Bob",email="bob@bob.com",password_hash=generate_password_hash("abcd"))
-    db.session.add(user_bob)
+    # user_bob = UserProfile(username="Bob",email="bob@bob.com",password_hash=generate_password_hash("abcd"))
+    # db.session.add(user_bob)
 
 
 
-    # deck1 = Deck(deck_name="deck1",owner=user_ben)
-    # db.session.add(deck1)
 
+    deck1 = Deck(deck_name="deck1",user_profile_id=1)
+    db.session.add(deck1)
+    db.session.commit()
+
+    author1 = Author(author_name="Billy",deck_id=deck1.id)
+    db.session.add(author1)
+    author2 = Author(author_name="Bobby",deck_id=deck1.id)
+    db.session.add(author2)
+    db.session.commit()
+
+    quote1 = Quote(quote_text="Billy Quote 1",author_id=author1.id,deck_id=deck1.id)
+    db.session.add(quote1)
+    quote2 = Quote(quote_text="Billy Quote 2",author_id=author1.id,deck_id=deck1.id)
+    db.session.add(quote2)
+    quote3 = Quote(quote_text="Bobby Quote 1",author_id=author2.id,deck_id=deck1.id)
+    db.session.add(quote3)
+    quote4 = Quote(quote_text="Bobby Quote 2",author_id=author2.id,deck_id=deck1.id)
+    db.session.add(quote4)
+    db.session.commit()
 
     try:
         db.session.commit()

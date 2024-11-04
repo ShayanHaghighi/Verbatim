@@ -1,9 +1,10 @@
-import client from "../../socket-connection";
+import client, { endGame } from "../../socket-connection";
 import { Player } from "../../game-models";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Accused from "./sub-states/accused";
 import RunningResults from "./sub-states/running-results";
+import ExitButton from "../../../../components/game/exit-button";
 
 interface props {
   gameCode: string | null;
@@ -26,7 +27,7 @@ export default function HostAnswer({
   //   { name: "baldy", score: 900, scoreIncrease: 0, hasAnswered: false },
   //   { name: "john", score: 1100, scoreIncrease: 811, hasAnswered: false },
   // ];
-  const [showFirstDiv, setShowFirstDiv] = useState(true);
+  const [showFirstDiv, setShowFirstDiv] = useState(false);
 
   function startRebuttal() {
     client.emit("start-rebuttal", {
@@ -59,7 +60,7 @@ export default function HostAnswer({
   }, []);
 
   return (
-    <div className="w-full h-full bg-accent2 flex flex-col">
+    <div className="w-full h-auto min-h-full overflow-x-hidden bg-accent2 flex flex-col justify-between items-center">
       <div
         className="bg-accent1 w-full flex flex-col rounded-b-[100%] shadow-inner"
         style={{
@@ -107,7 +108,7 @@ export default function HostAnswer({
           It was:
         </div>
       </div>
-      <div className="relative w-full h-full flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <AnimatePresence>
           {showFirstDiv ? (
             <motion.div
@@ -116,7 +117,7 @@ export default function HostAnswer({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 1 }}
-              className="absolute w-full h-full"
+              className="w-full h-full"
             >
               <Accused currentAccused={currentAccused} />
             </motion.div>
@@ -128,13 +129,15 @@ export default function HostAnswer({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 1 }}
-              className="absolute w-full h-full"
+              className="w-full h-full"
             >
               <RunningResults startRebuttal={startRebuttal} players={players} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+      <ExitButton onConfirm={endGame}/>
+
     </div>
   );
 }

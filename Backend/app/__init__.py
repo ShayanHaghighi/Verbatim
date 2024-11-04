@@ -24,7 +24,7 @@ def create_app():
     password = os.getenv('PASSWORD')
     db_port = os.getenv('DATABASE_SERVER_PORT')
     db_name = os.getenv('DATABASE_NAME')
-    backend.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://postgres:{password}@localhost:{db_port}/{db_name}"
+    backend.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://shayan:{password}@localhost:{db_port}/{db_name}"
 
     db.init_app(backend)
 
@@ -51,5 +51,5 @@ def create_app():
     from app.endpoints.game.GameSockets import init_sockets
 
     init_sockets(socketio)
-    # socketio.run(backend, host='127.0.0.1', port=5000)
-    socketio.run(backend, host='0.0.0.0', port=5000)
+    socketio.run(backend, host='127.0.0.1', port=5000)
+    # socketio.run(backend, host='0.0.0.0', port=5000)

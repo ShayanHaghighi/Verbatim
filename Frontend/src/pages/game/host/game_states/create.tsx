@@ -3,12 +3,13 @@ import { Player } from "../../game-models";
 import Dropdown from "../../../../components/dropdown";
 import deckHelper from "../../../../service/deck-helper";
 import IDeck, { IDeckShort } from "../../../../models/deck-model";
-import client from "../../socket-connection";
+import client, { endGame } from "../../socket-connection";
 import { TbCardsFilled } from "react-icons/tb";
 import { FaListOl } from "react-icons/fa";
 import { GoTriangleDown, GoTriangleUp } from "react-icons/go";
 import ConfirmationModal from "../../../../components/game/confirm-modal";
 import { backendURL } from "../../../../constants";
+import ExitButton from "../../../../components/game/exit-button";
 
 interface FormData {
   numQuestions: number;
@@ -68,7 +69,7 @@ function Host_Create_Game({
   return (
     <>
       {isCreating && (
-        <div className="size-full flex items-start justify-center bg-optionbg">
+        <div className="size-full flex flex-col items-center justify-between bg-optionbg overflow-scroll">
           <div></div>
           <div className="bg-whtdarkpp text-blk w-[80%] max-w-[60rem] h-fit mt-12 rounded-[2vh] p-10">
             <div className="text-[5vw] font-semibold">Options</div>
@@ -147,10 +148,12 @@ function Host_Create_Game({
               Create Game
             </button>
           </div>
+          <ExitButton onConfirm={endGame}/>
+
         </div>
       )}
       {!isCreating && (
-        <div className="size-full flex flex-col items-center justify-start bg-optionbg">
+        <div className="w-full h-auto min-h-full flex flex-col items-center justify-between bg-optionbg">
           <div className="mt-4 w-[50%] text-center font-bold py-2 px-2 text-[6vw] bg-white text-black">
             <div className="border-black border-4 size-full ">{gameCode}</div>
           </div>
@@ -182,62 +185,13 @@ function Host_Create_Game({
             ))}
           </div>
           <div className="w-[40%]">
-            <button className="btn-purple p-6 h-fit" onClick={start_game}>
+            <button className="btn-purple p-4 h-fit" onClick={start_game}>
               Start Game
             </button>
           </div>
+          <ExitButton onConfirm={endGame}/>
         </div>
       )}
-      {/* <form>
-        <div>
-          <label htmlFor="numQuestions">Number Questions</label>
-          <input
-            type="number"
-            id="numQuestions"
-            name="numQuestions"
-            value={formData.numQuestions}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="usingPassword">Password Required?</label>
-          <input
-            type="checkbox"
-            id="usingPassword"
-            name="usingPassword"
-            checked={usingPass}
-            onChange={() => {
-              setUsingPass(!usingPass);
-            }}
-          />
-        </div>
-        {usingPass && (
-          <div>
-            <label htmlFor="password">Password:</label>
-            <input
-              type="text"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-        )}
-        <Dropdown
-          list={decks}
-          currElement={formData.deck}
-          setCurrElement={(deck) =>
-            setFormData((prevData) => ({ ...prevData, deck: deck }))
-          }
-          displayFunc={(deck) => deck.deck_name}
-        ></Dropdown>
-        {/* <button type="submit">Create Game</button> 
-      </form>
-      <button onClick={handleSubmit}>Create Game</button>
-      <button onClick={start_game}>Start Game</button>
-
-      <p>{gameCode}</p>
-      <ul>{listPlayers}</ul> */}
     </>
   );
 }

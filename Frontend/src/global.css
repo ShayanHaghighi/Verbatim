@@ -230,8 +230,8 @@ body,
 }
 
 .animate-float {
-  -webkit-animation: action 1s infinite alternate;
-  animation: Float 1s ease-in-out infinite;
+  -webkit-animation: action 5s infinite alternate;
+  animation: Float 3s cubic-bezier(.49,0,.54,1) infinite;
 }
 
 @-webkit-keyframes action {
@@ -239,7 +239,7 @@ body,
     transform: translateY(0);
   }
   100% {
-    transform: translateY(-100px);
+    transform: translateY(5%);
   }
 }
 
@@ -249,6 +249,6 @@ body,
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-100px);
+    transform: translateY(30%);
   }
 }
