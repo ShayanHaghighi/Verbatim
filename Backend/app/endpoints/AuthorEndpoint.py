@@ -150,7 +150,7 @@ def auth_images_game():
 
     game:Game = games.get(game_code,None)
 
-    if not game_code or not player_name:
+    if not game_code or not game:
         return  {"msg":"game with game code does not exist"},400
 
     author_id = 0

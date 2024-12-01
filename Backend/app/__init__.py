@@ -22,9 +22,11 @@ def create_app():
 
     load_dotenv()
     password = os.getenv('PASSWORD')
+    username = os.getenv('DATABASE_USERNAME')
     db_port = os.getenv('DATABASE_SERVER_PORT')
     db_name = os.getenv('DATABASE_NAME')
-    backend.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://shayan:{password}@localhost:{db_port}/{db_name}"
+    print(username)
+    backend.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{username}:{password}@localhost:{db_port}/{db_name}"
 
     db.init_app(backend)
 

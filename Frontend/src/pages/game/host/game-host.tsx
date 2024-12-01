@@ -22,7 +22,7 @@ interface FormData {
 function Game_Owner() {
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [playersJoined, setPlayersJoined] = useState<Player[]>([]);
-  const [gameState, setGameState] = useState<gameStates>({ state: "rebuttal" });
+  const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [currentVotes, setCurrentVotes] = useState<Vote[]>([]);
   const [currentAccused, setCurrentAccused] = useState("");

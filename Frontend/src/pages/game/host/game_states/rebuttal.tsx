@@ -1,15 +1,12 @@
-import client, { endGame } from "../../socket-connection";
-import { Player, Question, Vote } from "../../game-models";
+import client from "../../socket-connection";
+import { Player, Vote } from "../../game-models";
 import { useEffect, useState, useRef } from "react";
 import CountdownTimerExternal from "../../../../components/TimerExternal";
 import ProgressBar from "../../../../components/game/progress-bar";
-import ExitButton from "../../../../components/game/exit-button";
 import useWindowDimensions from "../../../../components/window-dimentions";
 import { backendURL } from "../../../../constants";
 import "./rebuttal.css";
-import { gsap } from "gsap";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { image } from "framer-motion/client";
 interface props {
   gameCode: string | null;
   accusedName: string;
@@ -48,15 +45,14 @@ export default function HostRebuttal({
   const [currentXPos, setCurrentXPos] = useState(100);
   const [widthRatio, setWidthRatio] = useState(0);
   const [heightRatio, setHeightRatio] = useState(0);
-  const [offset, setOffset] = useState(0);
+  const [xOffset, setXOffset] = useState(0);
+  const [yOffset, setYOffset] = useState(0);
   const [filteredPlayers, setFilteredPlayers] =
     useState<Player[]>(getFilteredArray());
 
   useEffect(() => {
     setFilteredPlayers(getFilteredArray());
   }, players);
-
-
 
   useState(() => {
     const arr = Array(7);
@@ -66,28 +62,29 @@ export default function HostRebuttal({
     setDelayArray(arr);
   });
 
-  function getYValue(){
-    
+  function getYValue(yPos: number) {
+    if (heightRatio > widthRatio) {
+      return (yPos / 100) * height;
+    } else {
+      return (yPos / 100) * height + yOffset / 5;
+    }
   }
 
-  function getXValue(xPos:number){
-    if(heightRatio>widthRatio){
-    return xPos * heightRatio - offset
+  function getXValue(xPos: number) {
+    if (heightRatio > widthRatio) {
+      return xPos * heightRatio - xOffset;
+    } else {
+      return xPos * widthRatio - xOffset;
+    }
   }
-  else{
-    return xPos * widthRatio - offset
-  }
-}
 
   function moveLeft() {
     setCurrentXPos((prev) => Math.max(0, prev - 10));
-    console.log(currentXPos);
     calcOffsetValues(Math.max(0, currentXPos - 10));
   }
 
   function moveRight() {
     setCurrentXPos((prev) => Math.min(100, prev + 10));
-    console.log(currentXPos);
     calcOffsetValues(Math.min(100, currentXPos + 10));
   }
 
@@ -107,50 +104,54 @@ export default function HostRebuttal({
   }
   const { height, width } = useWindowDimensions();
 
-
   useEffect(() => {
-    if(imageRef.current){
-    setHeightRatio(imageRef.current.clientHeight/imageRef.current.naturalHeight)
-    setWidthRatio(imageRef.current.clientWidth/imageRef.current.naturalWidth)
-    if(widthRatio<heightRatio){
-      // this means the height is filled out and scrolling is enabled
-      // first, the scale down factor for the width is the heightRatio
-      // therefore you can calculate the FULL scaled down width by (naturalwidth * heightRatio)
-      // you can calculate how much horizontal width is hidden with (scaledDownwidth - actualwidth)
-      // therefore the current offset at 0% is hiddenwidth px, and 100% is 0px
-      // set the 'right' attribute to be: playerPos*widthRatio + offset
+    if (imageRef.current) {
+      setHeightRatio(
+        imageRef.current.clientHeight / imageRef.current.naturalHeight
+      );
+      setWidthRatio(
+        imageRef.current.clientWidth / imageRef.current.naturalWidth
+      );
+      if (widthRatio < heightRatio) {
+        // this means the height is filled out and scrolling is enabled
+        // first, the scale down factor for the width is the heightRatio
+        // therefore you can calculate the FULL scaled down width by (naturalwidth * heightRatio)
+        // you can calculate how much horizontal width is hidden with (scaledDownwidth - actualwidth)
+        // therefore the current offset at 0% is hiddenwidth px, and 100% is 0px
+        // set the 'right' attribute to be: playerPos*widthRatio + offset
 
-      const fullScaledDownWidth = imageRef.current.naturalWidth * heightRatio
-      const hiddenWidth = fullScaledDownWidth - imageRef.current.clientWidth
-      setOffset(((100-currentXPos)/100) * hiddenWidth)
-      console.log(offset)
-    }
-    else{
-      // this means the width has been filled out, and scrolling isnt enabled
-      // therefore can calculate player positions from widthRatio and heightRatio
-    }
-    }
-  },[height,width])
-
-  
-    function calcOffsetValues(newXPos:number){
-      if(widthRatio<heightRatio && imageRef.current){
-        const fullScaledDownWidth = imageRef.current.naturalWidth * heightRatio
-        const hiddenWidth = fullScaledDownWidth - imageRef.current.clientWidth
-        setOffset(((100-newXPos)/100) * hiddenWidth)
-        console.log(offset)
+        const fullScaledDownWidth = imageRef.current.naturalWidth * heightRatio;
+        const hiddenWidth = fullScaledDownWidth - imageRef.current.clientWidth;
+        setXOffset(((100 - currentXPos) / 100) * hiddenWidth);
+        console.log(xOffset);
+      } else {
+        // this means the width has been filled out, and scrolling isnt enabled
+        // therefore can calculate player positions from widthRatio and heightRatio
+        const fullScaledDownHeight =
+          imageRef.current.naturalHeight * widthRatio;
+        const hiddenHeight =
+          fullScaledDownHeight - imageRef.current.clientHeight;
+        setYOffset(hiddenHeight / 2);
       }
     }
+  }, [height, width]);
+
+  function calcOffsetValues(newXPos: number) {
+    if (widthRatio < heightRatio && imageRef.current) {
+      const fullScaledDownWidth = imageRef.current.naturalWidth * heightRatio;
+      const hiddenWidth = fullScaledDownWidth - imageRef.current.clientWidth;
+      setXOffset(((100 - newXPos) / 100) * hiddenWidth);
+      console.log(xOffset);
+    }
+  }
 
   const imageRef = useRef<HTMLImageElement>(null); // Ref for the larger image
-  const [smallImageShift, setSmallImageShift] = useState(0); // Small image shift in px
-
 
   function getXPos(index: number) {
-    return positions[index][0] + height / 120 - 8;
+    return positions[index][0];
   }
   function getYPos(index: number) {
-    return positions[index][1] + height / 55 - 15;
+    return positions[index][1];
   }
 
   function nextQuestion() {
@@ -160,25 +161,25 @@ export default function HostRebuttal({
     });
   }
   // TODO set accused name
-  const accusedName = "Billy";
-  currentVotes = [
-    {
-      score: 1,
-      voteCaster: "Barry",
-    },
-  ];
-  players = ["Billy", "Bobby", "Barry", "Billy", "Bobby", "Barry", "Barry"];
+  // const accusedName = "Billy";
+  // currentVotes = [
+  //   {
+  //     score: 1,
+  //     voteCaster: "Barry",
+  //   },
+  // ];
+  // players = ["Billy", "Bobby", "Barry", "Billy", "Bobby", "Barry", "Barry"];
   const positions = [
-    [640, 46],
-    [430, 45],
-    [200, 44],
-    [520, 52],
-    [310, 50],
+    [660, 46],
+    [450, 45],
+    [270, 44],
+    [560, 52],
+    [340, 50],
     [785, 51],
-    [70, 51],
+    [150, 51],
   ];
 
-  const accusedPosition = [1800, 44];
+  const accusedPosition = [1860, 44];
 
   const scoreMap: { [index: number]: string } = {
     1: "happy.png",
@@ -303,7 +304,7 @@ export default function HostRebuttal({
                 style={{
                   right: `${getXValue(getXPos(index))}px`,
                   transform: `translateX(${100}px)`,
-                  top: `${getYPos(index)}vh`,
+                  top: `${getYValue(getYPos(index))}px`,
                   animationDelay: `${delayArray[index]}s`,
                 }}
               >
@@ -321,7 +322,7 @@ export default function HostRebuttal({
             ))}
             <div
               style={{
-                top: `${accusedPosition[1]}vh`,
+                top: `${getYValue(accusedPosition[1])}px`,
                 right: `${getXValue(accusedPosition[0])}px`,
               }}
               className="w-fit transition-all h-fit rounded-full p-2 absolute  object-right big-shadow pulse-float"

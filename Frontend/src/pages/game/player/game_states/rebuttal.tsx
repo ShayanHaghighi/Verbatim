@@ -12,13 +12,15 @@ export default function PlayerRebuttal({
   currentScore: string | null;
   myName: string;
 }) {
-  const [myVote, setMyVote] = useState<number | null>(null);
+  currentAccused = "john";
+
+  const [myVote, setMyVote] = useState<number>(1);
+  const [hasVoted, setHasVoted] = useState(false);
   const amIAccused = myName == currentAccused;
-  function castVote(score: number) {
-    console.log(myName, currentAccused, amIAccused);
-    setMyVote(score);
+  function castVote() {
+    setHasVoted(true);
     client.emit("rebuttal-vote", {
-      score: score,
+      score: myVote,
       game_code: sessionStorage.getItem("game_code"),
       game_token: sessionStorage.getItem("game_token"),
     });
@@ -32,24 +34,20 @@ export default function PlayerRebuttal({
         <>
           <div>{currentScore}</div>
           <span>chat how screwed is: {currentAccused}</span>
-          {myVote ? (
+          {hasVoted ? (
             <div> You voted: {myVote}</div>
           ) : (
             <>
-              <button
-                onClick={() => {
-                  castVote(1);
-                }}
-              >
-                Vote 1
-              </button>
-              <button
-                onClick={() => {
-                  castVote(2);
-                }}
-              >
-                Vote 2
-              </button>
+              <input
+                type="range"
+                step={1}
+                min={1}
+                max={6}
+                value={myVote}
+                onChange={(value) => setMyVote(Number(value.target.value))}
+              />
+              <div>{myVote}</div>
+              <button onClick={castVote}>submit answer</button>
             </>
           )}
         </>
