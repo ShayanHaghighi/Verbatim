@@ -1,0 +1,28 @@
+.impact-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.impact-image {
+  width: 100%;
+  height: auto;
+  z-index: 1;
+}
+line {
+  stroke-width: 6px;
+  stroke-linecap: round;
+}
+/* .speed-line {
+  position: absolute;
+  width: 4px;
+  height: 100px;
+  background-color: rgba(255, 255, 255, 0.8);
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  opacity: 0;
+} */

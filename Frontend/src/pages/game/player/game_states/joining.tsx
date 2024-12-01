@@ -139,7 +139,7 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
       </form> */}
 
       <>
-        <div className="w-full h-auto flex flex-col items-center justify-between bg-optionbg">
+        <div className="game-bg bg-optionbg">
           <div className="bg-whtdarkpp text-blk w-[90%] md:w-[80%] max-w-[60rem] h-fit mt-12 rounded-[2vh] p-10 mb-6">
             <div className="text-[3em] font-semibold">Options</div>
             <div className="bg-[#A8A8A8] w-full h-[2px]"></div>
@@ -233,7 +233,7 @@ function Player_Join({ formData, setFormData, setPlayerName }: GameJoinProps) {
               </div>
             )}
           </div>
-          <ExitButton onConfirm={leaveGame}/>
+          <ExitButton onConfirm={leaveGame} />
         </div>
       </>
     </>

@@ -45,10 +45,10 @@ export default function Navbar(props: any) {
             Verbatim
           </div>
         </div>
-        <div className="relative flex flex-row flex-1 overflow-y-auto">
+        <div className="relative flex flex-row flex-1 ">
           {true && (
             <div
-              className={`z-10 absolute ${location.pathname == "/game/play" && (burgerOpen ? "md:absolute" : "hidden")} md:static h-full flex flex-col bg-[#210067] items-center justify-center ${burgerOpen ? "w-[100vw] left-0" : "w-[0vw] left-[-100px]"} transition-all duration-500 md:w-1/4 font-josefin`}
+              className={`z-10 absolute  ${location.pathname == "/game/play" || (location.pathname == "/game/host" && (burgerOpen ? "md:absolute" : "hidden"))} md:static h-full flex flex-col bg-[#210067] items-center justify-center ${burgerOpen ? "w-[100vw] left-0" : "w-[0vw] left-[-100px]"} transition-all duration-500 md:w-1/4 md:min-w-[25%] font-josefin`}
             >
               <div className="flex flex-row relative text-white items-center justify-center w-full h-max md:h-1/2">
                 <div className="flex flex-col w-fit px-6 xl:px-10 py-4 text-lg lg:text-2xl">

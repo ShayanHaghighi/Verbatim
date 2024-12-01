@@ -1,9 +1,11 @@
-import { createContext } from "react";
+import { createContext, useEffect } from "react";
 
 import useToken from "./pages/auth/token";
 import "./global.css";
 import MyRoutes from "./routing";
 import Navbar from "./components/navbar";
+import { useNavigate } from "react-router-dom";
+import { setNavigate } from "./utils/navigate";
 
 export const TokenContext = createContext<{
   setToken: (userToken: string) => void;
@@ -16,6 +18,11 @@ export const TokenContext = createContext<{
 });
 
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigate(navigate);
+  }, [navigate]);
   // const { token, removeToken, setToken } = useToken();
 
   return (

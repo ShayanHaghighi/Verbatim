@@ -156,7 +156,6 @@ def auth_images_game():
     author_id = 0
     for author_name in game.author_votes.keys():
         if author_name == player_name:
-            print(f"author found: {author_name}, {game.deck_id}")
             author = author_repo.get_by_author_and_deck_id(author_name=author_name,deck_id=game.deck_id)
             if not author:
                 return {"msg":"internal error - could not find that author"},500

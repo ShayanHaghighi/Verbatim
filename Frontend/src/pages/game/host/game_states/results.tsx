@@ -1,4 +1,6 @@
+import ExitButton from "../../../../components/game/exit-button";
 import { Player } from "../../game-models";
+import { endGame } from "../../socket-connection";
 
 export default function HostResults({
   authorVotes,

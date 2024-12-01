@@ -12,7 +12,7 @@ export default function BurgerMenu({ burgerOpen, setBurgerOpen }: any) {
   return (
     <>
       <div
-        className={`relative flex justify-start ${bigScreen && location.pathname != "/game/play" ? "hidden" : ""}`}
+        className={`relative flex justify-start ${bigScreen && !(location.pathname == "/game/play" || location.pathname == "/game/host") ? "hidden" : ""}`}
       >
         {/* <MdMenu className="text-white mr-4 w-full max-w-14 h-auto " /> */}
         <button

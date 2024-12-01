@@ -9,8 +9,9 @@ import HostResults from "./game_states/results";
 
 import { Vote, gameStates, Player, Question } from "../game-models";
 
-import client from "../socket-connection";
+import client, { endGame } from "../socket-connection";
 import ConfirmationModal from "../../../components/game/confirm-modal";
+import ExitButton from "../../../components/game/exit-button";
 
 interface FormData {
   numQuestions: number;
@@ -21,19 +22,13 @@ interface FormData {
 function Game_Owner() {
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [playersJoined, setPlayersJoined] = useState<Player[]>([]);
-  const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
+  const [gameState, setGameState] = useState<gameStates>({ state: "rebuttal" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [currentVotes, setCurrentVotes] = useState<Vote[]>([]);
   const [currentAccused, setCurrentAccused] = useState("");
   const [authorVotes, setAuthorVotes] = useState({});
   const [timeLimit, setTimeLimit] = useState(60);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [questionNum, setQuestionNum] = useState("0/1");
-  const [formData, setFormData] = useState<FormData>({
-    numQuestions: 1,
-    password: "",
-    deck: null,
-  });
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -45,17 +40,6 @@ function Game_Owner() {
       });
     }
   }, []);
-
-  function create_game(password: string) {
-    console.log("sending req to server");
-    client.emit("create-game", {
-      deck_id: formData.deck.id,
-      password: password,
-      num_questions: formData.numQuestions,
-    });
-    setPlayersJoined([]);
-  }
-
 
   function start_game() {
     client.emit("start-game", {
@@ -214,6 +198,7 @@ function Game_Owner() {
       sessionStorage.setItem("state", "rebuttal");
     });
     client.on("rebuttal-vote", (res) => {
+      console.log("rebuttal vote:");
       console.log(currentVotes);
       setCurrentVotes((prevVotes) => {
         return [...prevVotes, { voteCaster: res.name, score: res.score }];
@@ -244,14 +229,13 @@ function Game_Owner() {
   return (
     <>
       {/* <div className="h-full w-full"> */}
+      <div className="game-bg bg-accent2 relative overflow-auto">
         {gameState.state == "waiting" && (
           <Host_Create_Game
-            create_game={create_game}
+            setPlayersJoined={setPlayersJoined}
             start_game={start_game}
             gameCode={gameCode}
             playersJoined={playersJoined}
-            formData={formData}
-            setFormData={setFormData}
           ></Host_Create_Game>
         )}
         {gameState.state == "question" && (
@@ -274,8 +258,9 @@ function Game_Owner() {
         {gameState.state == "rebuttal" && (
           <HostRebuttal
             gameCode={gameCode}
-            question={currentQuestion}
+            accusedName={currentAccused}
             currentVotes={currentVotes}
+            players={playersJoined}
           ></HostRebuttal>
         )}
         {gameState.state == "results" && (
@@ -284,8 +269,9 @@ function Game_Owner() {
             authorVotes={authorVotes}
           ></HostResults>
         )}
-        
-      {/* </div> */}
+      </div>
+      {<ExitButton onConfirm={endGame} />}
+      {/* <div className="w-full h-4 absolute bottom-0 bg-black"></div> */}
     </>
   );
 }

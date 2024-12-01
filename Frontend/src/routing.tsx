@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Home from "./pages/home/home";
 import LoginForm from "./pages/auth/login";
 import SignUpForm from "./pages/auth/signup";
@@ -12,6 +12,8 @@ import useToken from "./pages/auth/token";
 
 import "./global.css";
 import DeckView from "./pages/decks/deck-view";
+import { setNavigate } from "./utils/navigate";
+import { useEffect } from "react";
 
 interface PrivateRouteProps {
   element: React.ReactElement;

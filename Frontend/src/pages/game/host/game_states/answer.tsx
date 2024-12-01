@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Accused from "./sub-states/accused";
 import RunningResults from "./sub-states/running-results";
+import ProgressBar from "../../../../components/game/progress-bar";
 import ExitButton from "../../../../components/game/exit-button";
+import { Shake } from "reshake";
+import { tr } from "framer-motion/client";
 
 interface props {
   gameCode: string | null;
@@ -28,30 +31,37 @@ export default function HostAnswer({
   //   { name: "john", score: 1100, scoreIncrease: 811, hasAnswered: false },
   // ];
   const [showFirstDiv, setShowFirstDiv] = useState(false);
+  const [objectionScreen, setObjectionScreen] = useState(false);
+  const [shakeVelocity, setShakeVelocity] = useState(0.01);
+
+  function easeOutCubic(x: number): number {
+    // console.log(x);
+    return 1 - Math.pow(1 - x, 3);
+  }
 
   function startRebuttal() {
-    client.emit("start-rebuttal", {
-      game_code: gameCode,
-      game_token: sessionStorage.getItem("game_token"),
-    });
+    setObjectionScreen(true);
+    const shakeId = setInterval(() => {
+      setShakeVelocity((prev) => easeOutCubic(prev));
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(shakeId);
+      console.log("starting rebuttal");
+      client.emit("start-rebuttal", {
+        game_code: gameCode,
+        game_token: sessionStorage.getItem("game_token"),
+      });
+    }, 3000);
   }
 
-  const gradientStyle = {
-    background: `linear-gradient(to right, #22c55e ${barProgress() - 5}%, #230453 ${barProgress() + 5}%, #230453 100%)`,
-  };
-
-  function barProgress() {
-    const fromNum = Number(questionNum.split("/")[0]);
-    const toNum = Number(questionNum.split("/")[1]);
-    return Math.round((fromNum / toNum) * 100);
-  }
   useEffect(() => {
     client.emit("current-game-info", {
       game_code: sessionStorage.getItem("game_code"),
     });
     const timer = setTimeout(() => {
       setShowFirstDiv(false);
-    }, 3000); // Show the first div for 3 seconds
+    }, 3000);
 
     return () => clearTimeout(timer);
     // client.emit("get-players", {
@@ -60,7 +70,24 @@ export default function HostAnswer({
   }, []);
 
   return (
-    <div className="w-full h-auto min-h-full overflow-x-hidden bg-accent2 flex flex-col justify-between items-center">
+    <>
+      {/* <div className="game-bg bg-accent2 relative"> */}
+      {objectionScreen && (
+        <div className="w-[100%] h-[100%] animate-float-smal absolute z-20 left-0 top-0">
+          <Shake
+            h={(1 - shakeVelocity) * 100}
+            v={(1 - shakeVelocity) * 100}
+            r={0}
+            fixed={true}
+          >
+            <img
+              src="/images/objection.png"
+              alt="objection image"
+              className="w-full h-full object-contain"
+            />
+          </Shake>
+        </div>
+      )}
       <div
         className="bg-accent1 w-full flex flex-col rounded-b-[100%] shadow-inner"
         style={{
@@ -78,15 +105,7 @@ export default function HostAnswer({
               <div>000 pts</div>
             </div>
           </div>
-          <div className="sm:flex hidden items-end flex-1 px-10">
-            <div className="flex flex-col w-full items-center">
-              <div
-                className={` h-2 w-full rounded-full`}
-                style={gradientStyle}
-              ></div>
-              <div>{questionNum}</div>
-            </div>
-          </div>
+          <ProgressBar questionNum={questionNum} />
           <div>
             <div className="flex flex-row justify-center py-2 px-4 text-white shadow-lg rounded-full w-28 bg-accent2">
               <img
@@ -108,7 +127,7 @@ export default function HostAnswer({
           It was:
         </div>
       </div>
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="relative w-full h-full flex items-center justify-center">
         <AnimatePresence>
           {showFirstDiv ? (
             <motion.div
@@ -117,7 +136,7 @@ export default function HostAnswer({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 1 }}
-              className="w-full h-full"
+              className="absolute w-full h-full"
             >
               <Accused currentAccused={currentAccused} />
             </motion.div>
@@ -129,15 +148,15 @@ export default function HostAnswer({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 1 }}
-              className="w-full h-full"
+              className="absolute w-full h-full"
             >
               <RunningResults startRebuttal={startRebuttal} players={players} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-      <ExitButton onConfirm={endGame}/>
 
-    </div>
+      {/* </div> */}
+    </>
   );
 }

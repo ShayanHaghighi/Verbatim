@@ -40,7 +40,6 @@ function Game_Player() {
     name: "",
   });
 
-
   useEffect(() => {
     setUpQuestionHandlers({
       setAnswerCorrect,

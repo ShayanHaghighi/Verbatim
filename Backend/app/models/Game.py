@@ -28,14 +28,23 @@ class Game():
         return [player.name for player in self.players.values()]
     
     def get_players(self):
-        return [{"name":player.name,"score":player.score,"score_increase":player.score_increase} for player in self.players.values()]
+        return [{"name":player.name,"score":player.score,"score_increase":player.get_score_increase()} for player in self.players.values()]
+
+    def get_available_names(self):
+        available_players = []
+        for author in list(self.author_votes.keys()):
+            if not author in self.get_player_names():
+                available_players.append(author)
+        return available_players
 
 class Player():
     def __init__(self,player_name) -> None:
         self.name: str = player_name
         self.score = 0
-        self.score_increase = 0
+        self.score_list = [0,]
         
+    def get_score_increase(self):
+        return self.score_list[-1] - self.score_list[-2]
 
 def gen_code():
     return ''.join(SystemRandom().choice(ascii_uppercase + digits) for _ in range(GAME_CODE_LENGTH))

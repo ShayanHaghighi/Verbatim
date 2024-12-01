@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { backendURL } from "../../constants";
 import { useNavigate } from "react-router-dom";
+import { navigateTo } from "../../utils/navigate";
 
 const client: Socket = io(backendURL, {
   transports: ["websocket"],
@@ -8,13 +9,12 @@ const client: Socket = io(backendURL, {
 
 export default client;
 
-export function leaveGame(){
-  const navigate = useNavigate();
+export function leaveGame() {
   client.emit("leave-game", {
     game_code: sessionStorage.getItem("game_code"),
     game_token: sessionStorage.getItem("game_token"),
   });
-  navigate("/");
+  navigateTo("/");
 }
 
 export function endGame() {
@@ -22,4 +22,6 @@ export function endGame() {
     game_code: sessionStorage.getItem("game_code"),
     game_token: sessionStorage.getItem("game_token"),
   });
+  navigateTo("/");
+  // TODO: show results?
 }

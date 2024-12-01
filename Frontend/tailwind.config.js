@@ -3,6 +3,11 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens: {
+        "height-sm": {
+          raw: "(min-height: 640px)",
+        },
+      },
       colors: {
         bkg: "rgb(var(--color-bkg) / <alpha-value>)",
         notbkg: "rgb(var(--color-notbkg) / <alpha-value>)",
@@ -25,6 +30,7 @@ export default {
       josefin: ['"Josefin Sans"', "Helvetica", "system-ui"],
       indie: ['"Indie Flower","Josefin Sans"', "Helvetica", "system-ui"],
       rubik: ['"Rubik Mono One","Josefin Sans"', "Helvetica", "system-ui"],
+      bowlby: ['"Bowlby One","Josefin Sans"', "Helvetica", "system-ui"],
     },
   },
   plugins: [],

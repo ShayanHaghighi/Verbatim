@@ -14,12 +14,12 @@ export default function PlayerRebuttal({
 }) {
   const [myVote, setMyVote] = useState<number | null>(null);
   const amIAccused = myName == currentAccused;
-  console.log(currentScore);
   function castVote(score: number) {
+    console.log(myName, currentAccused, amIAccused);
     setMyVote(score);
     client.emit("rebuttal-vote", {
       score: score,
-      game_code: gameCode,
+      game_code: sessionStorage.getItem("game_code"),
       game_token: sessionStorage.getItem("game_token"),
     });
   }

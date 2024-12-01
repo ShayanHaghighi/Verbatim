@@ -2,6 +2,19 @@ export interface gameStates {
   state: "waiting" | "question" | "answer" | "rebuttal" | "results";
 }
 
+export interface GameInfoOwner {
+  gameCode: string;
+  playersJoined: Player[];
+  gameState: gameStates;
+  currentQuestion: Question | null;
+  currentVotes: Vote[];
+  currentAccused: string;
+  timeLimit: number;
+  questionNum: string;
+}
+
+export interface GameInfoPlayer {}
+
 export interface Question {
   question: string;
   options?: string[];

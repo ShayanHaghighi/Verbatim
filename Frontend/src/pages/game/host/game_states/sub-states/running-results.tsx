@@ -3,6 +3,7 @@ import { Player } from "../../../game-models";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import AnimatedNumber from "../../../../../components/game/animated-number";
+import useWindowDimensions from "../../../../../components/window-dimentions";
 
 export default function RunningResults({
   startRebuttal,
@@ -21,10 +22,13 @@ export default function RunningResults({
     string[]
   >([]);
 
+  const { height, width } = useWindowDimensions();
+  const numPlayersShown = height < 793 ? 3 : 5;
+
   function getFinalRanking() {
     const finalRanking = [...players]
       .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+      .slice(0, numPlayersShown);
     return finalRanking.map((p) => p.name);
   }
 
@@ -36,7 +40,7 @@ export default function RunningResults({
         oldScore: p.score - p.scoreIncrease,
       }))
       .sort((a, b) => b.oldScore - a.oldScore)
-      .slice(0, 5);
+      .slice(0, numPlayersShown);
 
     setDisplayedPlayers(initialRanking);
     setPreviousRanks(initialRanking.map((p) => p.name));
@@ -55,7 +59,7 @@ export default function RunningResults({
     const timeout = setTimeout(() => {
       const newRanking = [...players]
         .sort((a, b) => b.score - a.score)
-        .slice(0, 5);
+        .slice(0, numPlayersShown);
 
       // Start animated score increments for each player
       newRanking.forEach((player) => {
@@ -95,14 +99,13 @@ export default function RunningResults({
   const getRankChange = (playerName: string, newIndex: number) => {
     const oldRank = previousRanksUnchanged.indexOf(playerName);
     if (oldRank === -1) return UP; // New entry
-    console.log(playerName + "," + oldRank);
 
     return oldRank > newIndex ? UP : oldRank < newIndex ? DOWN : STATIONARY;
   };
 
   return (
     <>
-      <div className="w-full h-full flex flex-col sm:flex-col justify-center items-center">
+      <div className="w-full h-full flex flex-col sm:flex-col justify-between items-center">
         <div className="flex mt-8 flex-col items-center w-[90%] max-w-[60rem] p-4 bg-[#220f4e] text-white rounded-lg">
           <h2 className="text-2xl font-bold mb-4">Leaderboard</h2>
           <div className="w-full h-full max-h-[20rem]">
@@ -118,7 +121,6 @@ export default function RunningResults({
                       : index == 2
                         ? "#6A2131"
                         : "#370b5f";
-                console.log(rankChange);
                 return (
                   <motion.div
                     key={player.name}
@@ -135,7 +137,7 @@ export default function RunningResults({
                       ease: "easeInOut",
                     }}
                     layout // ${!rowColors ? "bg-[#370b5f]" : index == 0 ? "bg-yellow-700" : index == 1 ? "bg-zinc-600" : index == 2 ? "bg-orange-800" : "bg-[#370b5f]"}
-                    className={` w-full flex justify-between items-center p-2   mb-2 rounded-md shadow-md h-14`}
+                    className={` w-full flex justify-between items-center p-2   mb-2 rounded-md shadow-md h-8 height-sm:h-14`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-lg text-[#8d71cf] opacity-90">
@@ -190,14 +192,13 @@ export default function RunningResults({
             </AnimatePresence>
           </div>
         </div>
-        <div className="flex justify-start sm:h-full sm:w-fit mb-4 mx-4">
-          <button
-            onClick={startRebuttal}
-            className="btn-purple p-8 flex justify-center items-center w-fit"
-          >
-            {"Next"}
-          </button>
-        </div>
+        <div className="flex justify-start sm:h-full sm:w-fit mb-4 mx-4"></div>
+        <button
+          onClick={startRebuttal}
+          className="btn-purple mb-8 p-8 px-16 flex justify-center items-center w-fit"
+        >
+          {"Next"}
+        </button>
       </div>
     </>
   );
