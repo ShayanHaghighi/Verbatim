@@ -31,7 +31,7 @@ export default function Navbar(props: any) {
   return (
     <>
       <div className="flex flex-col h-full w-full">
-        <div className="bg-darkpurple flex flex-row p-4 justify-between items-center">
+        <div className="bg-darkpurple flex flex-row p-4 max-h-[15vh] justify-between items-center">
           <div className="flex flex-row">
             <BurgerMenu burgerOpen={burgerOpen} setBurgerOpen={setBurgerOpen} />
             <div className="w-4"></div>
@@ -40,7 +40,7 @@ export default function Navbar(props: any) {
 
           <div
             onClick={() => navigate("/")}
-            className="text-white text-2xl font-bold"
+            className="text-white text-2xl font-bold cursor-pointer select-none"
           >
             Verbatim
           </div>

@@ -9,6 +9,7 @@ import { backendURL } from "../../../../constants";
 import "./rebuttal.css";
 import { gsap } from "gsap";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { image } from "framer-motion/client";
 interface props {
   gameCode: string | null;
   accusedName: string;
@@ -45,13 +46,17 @@ export default function HostRebuttal({
   const [delayArray, setDelayArray] = useState(Array(7));
   const [showingAnimation, setShowingAnimation] = useState(false);
   const [currentXPos, setCurrentXPos] = useState(100);
+  const [widthRatio, setWidthRatio] = useState(0);
+  const [heightRatio, setHeightRatio] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [filteredPlayers, setFilteredPlayers] =
     useState<Player[]>(getFilteredArray());
 
   useEffect(() => {
-    console.log(height);
     setFilteredPlayers(getFilteredArray());
   }, players);
+
+
 
   useState(() => {
     const arr = Array(7);
@@ -61,16 +66,29 @@ export default function HostRebuttal({
     setDelayArray(arr);
   });
 
+  function getYValue(){
+    
+  }
+
+  function getXValue(xPos:number){
+    if(heightRatio>widthRatio){
+    return xPos * heightRatio - offset
+  }
+  else{
+    return xPos * widthRatio - offset
+  }
+}
+
   function moveLeft() {
     setCurrentXPos((prev) => Math.max(0, prev - 10));
     console.log(currentXPos);
-    updatePos();
+    calcOffsetValues(Math.max(0, currentXPos - 10));
   }
 
   function moveRight() {
     setCurrentXPos((prev) => Math.min(100, prev + 10));
     console.log(currentXPos);
-    updatePos();
+    calcOffsetValues(Math.min(100, currentXPos + 10));
   }
 
   useEffect(() => {
@@ -87,35 +105,47 @@ export default function HostRebuttal({
   function getFilteredArray(): Player[] {
     return shuffle(players.filter((player) => player.name != currentAccused));
   }
+  const { height, width } = useWindowDimensions();
 
-  const [positionX, setPositionX] = useState(50); // Vertical position in %
-  const [prevPositionX, setPrevPositionX] = useState(50); // Previous Y position
+
+  useEffect(() => {
+    if(imageRef.current){
+    setHeightRatio(imageRef.current.clientHeight/imageRef.current.naturalHeight)
+    setWidthRatio(imageRef.current.clientWidth/imageRef.current.naturalWidth)
+    if(widthRatio<heightRatio){
+      // this means the height is filled out and scrolling is enabled
+      // first, the scale down factor for the width is the heightRatio
+      // therefore you can calculate the FULL scaled down width by (naturalwidth * heightRatio)
+      // you can calculate how much horizontal width is hidden with (scaledDownwidth - actualwidth)
+      // therefore the current offset at 0% is hiddenwidth px, and 100% is 0px
+      // set the 'right' attribute to be: playerPos*widthRatio + offset
+
+      const fullScaledDownWidth = imageRef.current.naturalWidth * heightRatio
+      const hiddenWidth = fullScaledDownWidth - imageRef.current.clientWidth
+      setOffset(((100-currentXPos)/100) * hiddenWidth)
+      console.log(offset)
+    }
+    else{
+      // this means the width has been filled out, and scrolling isnt enabled
+      // therefore can calculate player positions from widthRatio and heightRatio
+    }
+    }
+  },[height,width])
+
+  
+    function calcOffsetValues(newXPos:number){
+      if(widthRatio<heightRatio && imageRef.current){
+        const fullScaledDownWidth = imageRef.current.naturalWidth * heightRatio
+        const hiddenWidth = fullScaledDownWidth - imageRef.current.clientWidth
+        setOffset(((100-newXPos)/100) * hiddenWidth)
+        console.log(offset)
+      }
+    }
+
   const imageRef = useRef<HTMLImageElement>(null); // Ref for the larger image
   const [smallImageShift, setSmallImageShift] = useState(0); // Small image shift in px
 
-  function updatePos() {
-    const newPositionX = currentXPos;
 
-    if (imageRef.current) {
-      // Get intrinsic dimensions of the image
-      const imageWidth = imageRef.current.naturalWidth;
-      const containerWidth = imageRef.current.offsetWidth;
-
-      // Calculate how far the image moves in px
-      const visibleImageHeight = Math.max(imageWidth, containerWidth); // Visible height
-      const shift = ((newPositionX - prevPositionX) * visibleImageHeight) / 100;
-
-      // Update the shift for the smaller image
-      setSmallImageShift((prevShift) => prevShift + shift);
-      console.log("shift:");
-      console.log(smallImageShift);
-    }
-
-    setPrevPositionX(newPositionX);
-    setPositionX(newPositionX);
-  }
-
-  const { height, width } = useWindowDimensions();
   function getXPos(index: number) {
     return positions[index][0] + height / 120 - 8;
   }
@@ -139,16 +169,16 @@ export default function HostRebuttal({
   ];
   players = ["Billy", "Bobby", "Barry", "Billy", "Bobby", "Barry", "Barry"];
   const positions = [
-    [32, 47],
-    [17, 46],
-    [47, 47],
-    [9, 51],
-    [25, 50],
-    [40, 51],
-    [56, 50],
+    [640, 46],
+    [430, 45],
+    [200, 44],
+    [520, 52],
+    [310, 50],
+    [785, 51],
+    [70, 51],
   ];
 
-  const accusedPosition = [133, 52];
+  const accusedPosition = [1800, 44];
 
   const scoreMap: { [index: number]: string } = {
     1: "happy.png",
@@ -189,7 +219,6 @@ export default function HostRebuttal({
   function timerRanOut() {
     setHasTimerRunOut(true);
 
-    console.log("time has run out");
     // client.emit("question-finished", {
     //   game_code: game_code,
     //   game_token: sessionStorage.getItem("game_token"),
@@ -262,7 +291,7 @@ export default function HostRebuttal({
           <div className="relative z-0 overflow-hidden w-full h-full ">
             <img
               src="/images/court.png"
-              className="h-full w-auto object-cover object-right transition-all absolute right-0"
+              className="h-full w-auto min-w-full object-cover object-right transition-all absolute right-0"
               style={{
                 objectPosition: `${currentXPos}% 50%`,
               }}
@@ -272,7 +301,7 @@ export default function HostRebuttal({
               <div
                 className="size-fit min-w-[56px] transition-all md:min-w-[96px] rounded-full absolute animate-float object-right "
                 style={{
-                  right: `${getXPos(index) + currentXPos - 100}vh`,
+                  right: `${getXValue(getXPos(index))}px`,
                   transform: `translateX(${100}px)`,
                   top: `${getYPos(index)}vh`,
                   animationDelay: `${delayArray[index]}s`,
@@ -283,7 +312,7 @@ export default function HostRebuttal({
                     <img
                       key={player.name}
                       src={`${backendURL}/api/author/images?game_code=${sessionStorage.getItem("game_code")}&player_name=${player.name}`}
-                      className={`size-12 md:size-20 rounded-full`}
+                      className={`size-16 min-w-16 md:size-20 rounded-full`}
                     />
                   </div>
                 </div>
@@ -293,14 +322,14 @@ export default function HostRebuttal({
             <div
               style={{
                 top: `${accusedPosition[1]}vh`,
-                left: `${-accusedPosition[0] - smallImageShift / 25 + 125 + height / 400}vh`,
+                right: `${getXValue(accusedPosition[0])}px`,
               }}
               className="w-fit transition-all h-fit rounded-full p-2 absolute  object-right big-shadow pulse-float"
             >
               <div className="bg-white w-fit h-fit rounded-full">
                 <img
                   src={`/author_images/${currentAccused}.png`}
-                  className={`size-32 rounded-full`}
+                  className={`size-32 min-w-32 min-h-32 rounded-full`}
                 />
               </div>
             </div>
@@ -311,11 +340,11 @@ export default function HostRebuttal({
           </div>
           <FaArrowLeft
             onClick={moveLeft}
-            className="absolute left-10 top-10 size-20 text-purple big-drop-shadow"
+            className="cursor-pointer absolute left-10 top-10 size-20 text-purple big-drop-shadow"
           />
           <FaArrowRight
             onClick={moveRight}
-            className="absolute right-10 top-10 size-20 text-purple big-drop-shadow"
+            className="cursor-pointer absolute right-10 top-10 size-20 text-purple big-drop-shadow"
           />
 
           <div className="absolute bottom-6 left-50% select-none">

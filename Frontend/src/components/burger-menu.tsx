@@ -17,17 +17,17 @@ export default function BurgerMenu({ burgerOpen, setBurgerOpen }: any) {
         {/* <MdMenu className="text-white mr-4 w-full max-w-14 h-auto " /> */}
         <button
           onClick={() => setBurgerOpen(!burgerOpen)}
-          className="group h-20 w-20 rounded-lg border-2 border-white hover:border-accent2 hover:bg-white transition-all duration-300"
+          className="group size-10 height-sm:size-20 rounded-lg border-2 border-white hover:border-accent2 hover:bg-white transition-all duration-300"
         >
           <div className="flex flex-col items-center">
             <span
-              className={`h-1 my-1 w-9 rounded-full bg-white group-hover:bg-accent2 ${burgerOpen && "rotate-45 translate-y-3"} transition-all duration-300`}
+              className={`h-1 my-0.5 height-sm:my-1 w-5 height-sm:w-9 rounded-full bg-white group-hover:bg-accent2 ${burgerOpen && "rotate-45 translate-y-3"} transition-all duration-300`}
             ></span>
             <span
-              className={`h-1 my-1 w-9 rounded-full bg-white group-hover:bg-accent2 ${burgerOpen && "rotate-45"} transition-all duration-300`}
+              className={`h-1 my-0.5 height-sm:my-1 w-5 height-sm:w-9 rounded-full bg-white group-hover:bg-accent2 ${burgerOpen && "rotate-45"} transition-all duration-300`}
             ></span>
             <span
-              className={`h-1 my-1 w-9 rounded-full bg-white group-hover:bg-accent2 ${burgerOpen && "-rotate-45 -translate-y-3"} transition-all duration-300`}
+              className={`h-1 my-0.5 height-sm:my-1 w-5 height-sm:w-9 rounded-full bg-white group-hover:bg-accent2 ${burgerOpen && "-rotate-45 -translate-y-3"} transition-all duration-300`}
             ></span>
           </div>
         </button>
