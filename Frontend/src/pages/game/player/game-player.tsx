@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import client from "../socket-connection";
-import PlayerQuestion, { setUpQuestionHandlers } from "./game_states/question";
+import PlayerQuestion from "./game_states/question";
 import Player_Waiting from "./game_states/waiting";
 import { setUpHandlers } from "./handler-setup";
 import PlayerAnswer from "./game_states/answer";
@@ -9,8 +9,7 @@ import Player_Join from "./game_states/joining";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../../components/game/confirm-modal";
 
-interface FormData {
-  gameCode: string;
+export interface FormData {
   name: string;
 }
 
@@ -18,92 +17,110 @@ interface gameStates {
   state: "joining" | "waiting" | "question" | "answer" | "rebuttal";
 }
 
+export interface GameStats {
+    question_number: number;
+    total_questions: number;
+    score: number;
+}
+
 export interface Question {
   question: string;
   options: string[];
+  time_limit: number;
+
+}
+
+export interface Answer {
+    score_increase: number;
+    answer: string;
+}
+
+export function formatQNum(gameStats: GameStats | null) {
+    return gameStats ? `${gameStats.question_number}/${gameStats.total_questions}` : "";
+}
+
+export function setUpQuestionHandlers({
+                                          setCurrentQuestion,
+                                          setGameState,
+                                          setCurrentAnswer,
+                                          setGameStats,
+                                      }: any) {
+    client.on("question", (res) => {
+        console.log("game has started");
+        setCurrentQuestion(res);
+        setGameStats(res)
+        setGameState({ state: "question" });
+    });
+    client.on("results", (res) => {
+        console.log(res.isCorrect);
+        setCurrentAnswer(res)
+        setGameStats(res)
+        setGameState({ state: "answer" });
+    });
+    client.on("start-rebuttal", (res) => {
+        setGameState({ state: "rebuttal" });
+    });
 }
 
 function Game_Player() {
-  const [gameState, setGameState] = useState<gameStates>({ state: "joining" });
-  const [isAnswerCorrect, setAnswerCorrect] = useState<boolean | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-  const [currentAccused, setCurrentAccused] = useState<string | null>(null);
-  const [currentScore, setCurrentScore] = useState<string | null>(null);
-  const [myPlayerName, setMyPlayerName] = useState<string>("");
-  const [timeLimit, setTimeLimit] = useState(60);
-  const [questionNum, setQuestionNum] = useState("0/1");
-  const [score, setScore] = useState(0);
 
+    const [gameState, setGameState] = useState<gameStates>({ state: "joining" });
+    const [playerName, setPlayerName] = useState<string>("");
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [gameStats, setGameStats] = useState<GameStats>({player_name: "", score:0,total_questions:0,question_number:0});
+
+  const [currentAnswer, setCurrentAnswer] = useState<Answer>({score_increase:0,answer:""});
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<FormData>({
-    gameCode: "",
-    name: "",
-  });
 
   useEffect(() => {
     setUpQuestionHandlers({
-      setAnswerCorrect,
       setCurrentQuestion,
       setGameState,
-      setTimeLimit,
-      setCurrentScore,
+        setCurrentAnswer,
+        setGameStats
     });
 
-    setUpHandlers({ setGameState, setCurrentAccused });
+    setUpHandlers({ setGameState });
 
     client.on("force-end", (_) => {
       navigate("/");
     });
-    client.on("current-game-info", (res) => {
-      setQuestionNum(res.question_no);
-      setScore(res.score);
-    });
+
 
     return () => {
       client.removeAllListeners();
     };
   });
 
-  // function rejoinGame(){
-  //   if(sessionStorage.getItem('game_code')!=null && sessionStorage.getItem('game_token')!=null){
-  //     client.emit('rejoin-game'){
-
-  //     }
-  //   }
-  //   }
 
   return (
     <>
       {gameState.state == "joining" && (
         <Player_Join
-          formData={formData}
-          setFormData={setFormData}
-          setPlayerName={setMyPlayerName}
+          playerName={playerName}
+          setPlayerName={setPlayerName}
+          setGameState={setGameState}
         ></Player_Join>
       )}
       {gameState.state == "waiting" && <Player_Waiting></Player_Waiting>}
       {gameState.state == "question" && (
         <PlayerQuestion
-          questionNum={questionNum}
+            playerName={playerName}
           question={currentQuestion}
-          timeLimit={timeLimit}
-          score={score}
+          gameStats={gameStats}
         ></PlayerQuestion>
       )}
       {gameState.state == "answer" && (
         <PlayerAnswer
-          isAnswerCorrect={isAnswerCorrect}
-          questionNum={questionNum}
-          score={score}
-          currentAccused={currentAccused}
+          answer={currentAnswer}
+          gameStats={gameStats}
         ></PlayerAnswer>
       )}
       {gameState.state == "rebuttal" && (
         <PlayerRebuttal
-          currentAccused={currentAccused}
-          gameCode={formData.gameCode}
-          currentScore={currentScore}
-          myName={myPlayerName}
+          currentAccused={currentAnswer.answer}
+          gameStats={gameStats}
+          myName={playerName}
         ></PlayerRebuttal>
       )}
     </>

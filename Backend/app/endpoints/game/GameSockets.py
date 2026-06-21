@@ -4,14 +4,14 @@ from random import SystemRandom
 from string import ascii_lowercase,digits
 
 from ...models.Game import games,Player,Game
-from ...dbManagement import DeckRepository as deck_repo
 
 players = {}
 
 TOKEN_LENGTH = 32
 WAITING,QUESTION,ANSWER,REBUTTAL,RESULTS = [0,1,2,3,4]
 
-# TODO: add game code as url query param (hash?)
+game = None
+MAIN_ROOM="main_room"
 
 def gen_token():
     return ''.join(SystemRandom().choice(ascii_lowercase + digits) for _ in range(TOKEN_LENGTH))
@@ -24,330 +24,148 @@ def init_sockets(socketio:SocketIO):
 
     @socketio.on('create-game')
     def handle_create_game(data:dict):
-        deck_id = data.get('deck_id',None)
-        password = data.get('password',None)
-        num_questions = data.get('num_questions',None)
+        global game, QUESTION,ANSWER,REBUTTAL,RESULTS
+        print("creating game")
 
-        deck = deck_repo.get_by_id(deck_id)
-        if not deck:
-            emit("user-error", {"error:":"deck id not valid"})
-            return
-        for game in games.values():
-            if request.sid==game.owner_sid:
-                del game
-                break
-        
+        if game:
+            if game.state == QUESTION:
+                message = {"question":game.get_current_question().quote_text,"options":list(game.author_votes.keys()),"time_limit":game.time_limit,"question_number":game.current_q_index,"total_questions":game.num_questions}
+                emit('question',message)
+                return
+            if game.state == ANSWER:
+                emit('player-scores',{'scores':game.get_players(),'answer':game.get_current_question().player_name})
+            if game.state == REBUTTAL:
+                emit('rebuttal-details',{"question":{'question':game.get_current_question().quote_text,'answer':game.get_current_question().player_name}})
 
-        
-        
+        num_questions = data.get('num_questions',30)
 
-        game = Game(deck=deck, password=password,num_questions=int(num_questions))
+        game = Game(num_questions=int(num_questions))
         game.owner_sid = request.sid
-        games[game.game_code] = game
-        game_token = gen_token()
-        game.owner_token = game_token
-        emit('code', {'game_code': game.game_code,"game_token":game_token})
 
-    @socketio.on('game-info-req')
-    def get_game_info(data:dict):
-        game_code = data.get("game_code",None)
-
-        game:Game = games.get(game_code,None)
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-
-        
-        emit('game-info', {'password_needed': not not game.password,'authors':game.get_available_names() })
-
-    @socketio.on('current-game-info')
-    def get_current_info(data:dict):
-     
-        game_code = data.get("game_code", None)
-        game_token = data.get("game_token", None)
-        game:Game = games.get(game_code,None)
-        if not game:
-            emit('user-error','Game code not valid')
-            return
-        # TODO auth by checking player code matches one of the players in the game
-        message = {"question_no":f"{game.current_q_index+1}/{game.num_questions}"}
-        if game_token:
-            message["score"] = game.players[game_token].score
-
-        emit('current-game-info',message)
 
     @socketio.on('join-game')
     def join_game(data:dict):
-        game_code = data.get("game_code",None)
+        global game
         player_name = data.get("name",None)
-        password = data.get("password",None)
-        game:Game = games.get(game_code,None)
+        print(f"player {player_name} is joining")
         if not game:
-            emit("user-error", {"error:":"game code not valid"})
+            emit("user-error", {"error:":"game not started yet"})
             return
-
-        if bool(game.password) and game.password != password:
-            emit("user-error", {"error:":"incorrect password"})
-            return     
-        if player_name in game.get_player_names():
-            emit("user-error", {"error:":"user with that name already exists"})
-            return            
-        game_token = gen_token()
 
       
         player = Player(player_name=player_name)
-        game.players[game_token] = player
+        game.players[player_name] = player
 
-        join_room(game_code)
-        emit('joined-game', {"game_token":game_token})
-        emit('game-info',{'authors':game.get_player_names()})
+        join_room(player_name)
+        join_room(MAIN_ROOM)
         emit("players-update",{"players": game.get_player_names()},to=game.owner_sid)
 
     
-    @socketio.on('get-players')
-    def handle_player_update(data:dict):
-        game_code = data.get("game_code",None)
-        
-        game:Game = games.get(game_code,None)
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-        
-        if request.sid==game.owner_sid:
-            emit('updated-players',game.get_players())
-    # @socketio.on("disconnect-custom")
-    # def handle_custom_disconnect(data):
-    #     print(data)
-
-
-    # TODO from game.players, remove the associated player using request,sid
-    @socketio.on("disconnect")
-    def handle_disconnect():
-        print(request.sid + " --- disconnected")
-
-
     @socketio.on("start-game")
     def handle_start_game(data:dict):
 
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
+        global game
+        print("game started")
         if not game:
             emit("user-error", {"error:":"game code not valid"})
             return
         
-        if game.owner_sid != request.sid:
-            if game.owner_token != game_token:
-                emit('user-error',"you are not permitted to do that action" ,to=request.sid)
-                return
-            else:
-                game.owner_sid = request.sid
+
+
         game.state = QUESTION
 
-        first_question = game.questions[0]['quote']
+        first_question = game.questions[0].quote_text
         options = list(game.author_votes.keys())
-        message = {"question":first_question,"options":options,"time_limit":game.time_limit}
+        message = {"question":first_question,"options":options,"time_limit":game.time_limit,"question_number":game.current_q_index,"total_questions":game.num_questions}
 
-        emit('question',message ,to=game_code)
+
+        emit('question',message ,to=MAIN_ROOM)
         send_message_to_client(game.owner_sid,'question', body=message)
 
-    @socketio.on("my-answer")
+    @socketio.on("answer")
     def handle_answer(data:dict):
-        game_code = data.get("game_code",None)
+        global game
+        player_name = data.get("player_name",None)
         answer = data.get("answer",None)
-        game_token = data.get("game_token",None)
         time_taken_ratio = data.get("time_taken_ratio",None)
-        
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
-        game:Game = games.get(game_code,None)
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-        player:Player = game.players.get(game_token,None)
+
+        print(f"got answer from {player_name}")
+
+
+        player:Player = game.players.get(player_name,None)
         if not player:
             emit("user-error", {"error:":"you are not in this game"})
             return
         emit("new-answer",{"name":player.name},to=game.owner_sid)
-        if answer == game.questions[game.current_q_index]['author']:
+        if answer == game.questions[game.current_q_index].player_name:
             player.score += round(500 + 600 * (( time_taken_ratio)**2))
             player.score_list.append(player.score)
-            emit("answer-correctness",{"isCorrect":True})
         else:
             player.score_list.append(player.score)
-            emit("answer-correctness",{"isCorrect":False})
-        
 
-    @socketio.on("question-finished")
+
+    @socketio.on("question-end")
     def handle_question_finished(data:dict):
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-        if game.owner_token == game_token:
-            if game.owner_sid != request.sid:
-                game.owner_sid = request.sid
+        print("question ended")
+        global game
 
-            for player in game.players.values():
-                if len(player.score_list) == game.current_q_index+1:
-                    player.score_list.append(player.score)
-            for player in game.players.values():
-                print(f"name: {player.name}, score: {player.score_list}")
+        for player in game.players.values():
+            if len(player.score_list) == game.current_q_index+1:
+                player.score_list.append(player.score)
+        for player in game.players.values():
+            print(f"name: {player.name}, score: {player.score_list}")
 
-            game.state = ANSWER
-            author = (game.questions[game.current_q_index])["author"]
-            emit('question-finished',{'answer':author},to=game.game_code)
-            emit('player-scores',{'scores':game.get_players(),'answer':author})
-        else:
-            emit('user-error',"you are not permitted to do that action")
-
-    @socketio.on("get-increase")
-    def handle_score_increase(data:dict):
-        
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
-
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
-        player:Player = game.players.get(game_token,None)
-        if not player:
-            emit("user-error", {"error:":"Please provide a valid game_token"})
-            return
-        
-        emit('score-increase',{'increase':player.get_score_increase()})
+        game.state = ANSWER
+        author = (game.questions[game.current_q_index]).player_name
+        for player in game.players.values():
+            emit('results',{'answer':author, 'score_increase':player.get_score_increase(),'score':player.score,"question_number":game.current_q_index,"total_questions":game.num_questions},to=player.name)
+        emit('player-scores',{'scores':game.get_players(),'answer':author})
 
     @socketio.on("start-rebuttal")
     def handle_rebuttal_start(data:dict):
 
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
+        global game
 
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
-        if game.owner_token == game_token:
-            if game.owner_sid != request.sid:
-                game.owner_sid = request.sid
-            game.state = REBUTTAL
-            author = game.questions[game.current_q_index]['author']
-            emit('start-rebuttal',{"author_name":author},to=game.game_code,)
-            emit('rebuttal-details',{"question":game.questions[game.current_q_index]})
-        else:
-            emit('user-error',"you are not permitted to do that action")
+
+        if game.owner_sid != request.sid:
+            game.owner_sid = request.sid
+        game.state = REBUTTAL
+        author = game.questions[game.current_q_index].player_name
+        question = game.questions[game.current_q_index]
+        emit('start-rebuttal',{"author_name":author},to=MAIN_ROOM)
+        emit('rebuttal-details',{"question":{'question':question.quote_text,'answer':question.player_name}})
+
     
     @socketio.on("rebuttal-vote")
     def handle_rebuttal_vote(data:dict):
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
+        global game
+        player_name = data.get("player_name",None)
         score = data.get("score",None)
-        game_token = data.get("game_token",None)
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
-        if not game:
-            emit("user-error", {"error:":"game code not valid"})
-            return
-        author = game.questions[game.current_q_index]['author']
+        print("rebuttal vote",player_name,score)
+
+        author = game.questions[game.current_q_index].player_name
         game.author_votes[author] += score # TODO make sure score is in certain bounds?
-        player:Player = game.players[game_token]
-        emit('rebuttal-vote',{"name":player.name,"score":score},to=game.owner_sid)
+        emit('rebuttal-vote',{"name":player_name,"score":score},to=game.owner_sid)
         
     @socketio.on("rebuttal-end")
     def handle_rebuttal_end(data:dict):
-
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
-        if not game_token:
-            emit("user-error", {"error:":"Please provide a game_token"})
-            return
-        if game.owner_token == game_token :
-            if game.owner_sid != request.sid:
-                game.owner_sid = request.sid
-            game.current_q_index += 1
-            if game.current_q_index < game.num_questions:
-                game.state = QUESTION
-                question = game.questions[game.current_q_index]['quote']
-                options = list(set([question['author'] for question in game.questions]))
-                message = {"question":question,"options":options,"time_limit":game.time_limit}
-
-                emit('question',message ,to=game_code)
-                send_message_to_client(game.owner_sid,'question', body=message)
-            else:
-                game.state = RESULTS
-                emit('game-end' ,to=game_code)
-                emit('game-end',{"authorVotes":game.author_votes},to=game.owner_sid)
-
-        else:
-            emit('user-error',"you are not permitted to do that action")
-
-    @socketio.on("update")
-    def handle_update(data:dict):
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
-        
-        if not game or not game_token:
-            emit("user-error", {"error:":"Please provide a game_token and valid game_code"})
-            return
-        if game.owner_token == game_token:
+        global game
+        if game.owner_sid != request.sid:
             game.owner_sid = request.sid
-            if game.state == WAITING:
-                emit("update",{"state":"waiting","players": game.get_player_names()})
-            elif game.state == QUESTION:
-                question = game.questions[game.current_q_index]['quote']
-                options = list(set([question['author'] for question in game.questions]))
-                message = {"question":question,"options":options}
-                emit('update',{"state":"question","question":message})
-            elif game.state == ANSWER:
-                emit('update',{"state":"answer","scores":game.get_players()})
-            elif game.state == REBUTTAL:
-                emit('update',{"state":"rebuttal","question":game.questions[game.current_q_index]})
-            elif game.state == RESULTS:
-                emit('update',{"state":"results","authorVotes":game.author_votes},to=game.owner_sid)
+        game.current_q_index += 1
+        if game.current_q_index < game.num_questions:
+            game.state = QUESTION
+            question = game.questions[game.current_q_index].quote_text
+            options = list(set([question.player_name for question in game.questions]))
+            message = {"question":question,"options":options,"time_limit":game.time_limit,"question_number":game.current_q_index,"total_questions":game.num_questions}
 
-    # @socketio.on("rejoin-game")
-    # def handle_rejoin(data:dict):
-    #     print("rejoining")
-    #     game_code = data.get("game_code",None)
-    #     game:Game = games.get(game_code,None)
-    #     game_token = data.get("game_token",None)
-    #     if not game_token or not game:
-    #         emit("user-error", {"error:":"Please provide a game_token and game_code"})
-    #         return
-    #     if game_token in game.players:
-    #         player = game.players[game_token]
-    #         if game.state == WAITING:
-    #             emit("rejoin-info",{"state":"waiting","name": player.name})
-    #         elif game.state == QUESTION:
-    #             question = game.questions[game.current_q_index]['quote']
-    #             options = list(set([question['author'] for question in game.questions]))
-    #             message = {"question":question,"options":options, }
-    #             emit('rejoin-info',{"state":"question","question":message,"time_limit":game.time_limit})
-    #         elif game.state == ANSWER:
-    #             emit('rejoin-info',{"state":"answer","scores":game.get_players()})
-    #         elif game.state == REBUTTAL:
-    #             emit('rejoin-info',{"state":"rebuttal","question":game.questions[game.current_q_index]})
-    #         elif game.state == RESULTS:
-    #             emit('rejoin-info',{"state":"results","authorVotes":game.author_votes},to=game.owner_sid)
+            emit('question',message ,to=MAIN_ROOM)
+            send_message_to_client(game.owner_sid,'question', body=message)
+        else:
+            game.state = RESULTS
+            emit('game-end' ,to=MAIN_ROOM)
+            emit('game-end',{"authorVotes":game.author_votes},to=game.owner_sid)
+
 
 
 
@@ -368,18 +186,8 @@ def init_sockets(socketio:SocketIO):
 
     @socketio.on("end-game")
     def handle_end_game(data:dict):
-        game_code = data.get("game_code",None)
-        game:Game = games.get(game_code,None)
-        game_token = data.get("game_token",None)
-        if not game_token and game.state == WAITING:
-            del game
-            emit('game-deleted')
-            emit('force-end',to=game_code)
-        elif game.owner_token == game_token:
-            del game
-            emit('game-deleted')
-            emit('force-end',to=game_code)
-
+        global game
+        game = None
     
 
     def send_message_to_client(sid,event, body=""):

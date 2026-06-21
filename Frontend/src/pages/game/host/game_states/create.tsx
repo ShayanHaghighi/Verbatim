@@ -33,10 +33,6 @@ function Host_Create_Game({
   playersJoined,
 }: GameOwnerProps) {
   const [isCreating, setIsCreating] = useState(true);
-  const [usingPass, setUsingPass] = useState(false);
-  const [decks, setDecks] = useState<IDeckShort[]>([]);
-  const [copiedGameCode, setCopiedGameCode] = useState(false);
-  const { getAllDecks } = deckHelper();
 
   const [formData, setFormData] = useState<FormData>({
     numQuestions: 1,
@@ -44,40 +40,16 @@ function Host_Create_Game({
     deck: null,
   });
 
-  function copyGameCode() {
-    if (gameCode != null) {
-      setCopiedGameCode(true);
-      navigator.clipboard.writeText(gameCode);
-      setInterval(() => setCopiedGameCode(false), 2000);
-    }
-  }
 
-  function create_game(password: string) {
+
+  function create_game() {
     console.log("sending req to server");
     client.emit("create-game", {
-      deck_id: formData.deck.id,
-      password: password,
       num_questions: formData.numQuestions,
     });
     setPlayersJoined([]);
   }
 
-  useEffect(() => {
-    getAllDecks()
-      .then((response) => {
-        setDecks(response);
-        setFormData((prevData) => ({
-          ...prevData,
-          deck: response[0],
-          numQuestions:
-            response[0].num_quotes == undefined ? 1 : response[0].num_quotes,
-        }));
-      })
-      .catch((error) => {
-        console.log("there has been an error");
-        console.log(error);
-      });
-  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,8 +60,7 @@ function Host_Create_Game({
   };
 
   const handleSubmit = () => {
-    const password = usingPass ? formData.password : "";
-    create_game(password);
+    create_game();
   };
 
   return (
@@ -101,20 +72,8 @@ function Host_Create_Game({
               <div className="text-[5vw] font-semibold">Options</div>
               <div className="bg-[#A8A8A8] w-full h-[2px]"></div>
               <div className="flex flex-row p-[1vw] justify-between">
-                <div className="flex flex-row items-center flex-1">
-                  <TbCardsFilled className="size-8 text-[#7964A3]" />
-                  <div className="ml-2 text-xl">Deck:</div>
-                </div>
-                <div className="flex-1 p-2">
-                  <Dropdown
-                    list={decks}
-                    currElement={formData.deck}
-                    setCurrElement={(deck) =>
-                      setFormData((prevData) => ({ ...prevData, deck: deck }))
-                    }
-                    displayFunc={(deck) => deck.deck_name}
-                  ></Dropdown>
-                </div>
+
+
               </div>
               <div className="flex flex-row p-[1vw] justify-between">
                 <div className="flex flex-row items-center flex-1">
@@ -139,9 +98,7 @@ function Host_Create_Game({
                         setFormData((prevData) => ({
                           ...prevData,
                           numQuestions:
-                            formData.deck.num_quotes == formData.numQuestions
-                              ? formData.numQuestions
-                              : formData.numQuestions + 1,
+                             formData.numQuestions + 1,
                         }))
                       }
                     >
@@ -153,9 +110,7 @@ function Host_Create_Game({
                         setFormData((prevData) => ({
                           ...prevData,
                           numQuestions:
-                            formData.numQuestions > 1
-                              ? formData.numQuestions - 1
-                              : 1,
+                            formData.numQuestions - 1
                         }))
                       }
                     >
@@ -180,20 +135,7 @@ function Host_Create_Game({
       )}
       {!isCreating && (
         <div className="game-bg bg-optionbg">
-          <div className="mt-4 w-[80%] md:w-[50%] min-w-fit h-fit flex justify-center items-center text-center font-bold py-2 px-2 text-[6vw] bg-white text-black">
-            <div className="border-black border-4 size-full text-[16vw] md:text-[6vw] text-nowrap font-bowlby font-medium flex justify-center items-center">
-              {gameCode}
-              <div className="flex justify-center items-center">
-                <MdContentCopy
-                  className="text-zinc-400 font-bold size-8 ml-8 cursor-pointer"
-                  onClick={copyGameCode}
-                />
-                <FaCheck
-                  className={`${copiedGameCode ? "opacity-100" : "opacity-0"} transition-all duration-200 size-4 text-zinc-400 `}
-                />
-              </div>
-            </div>
-          </div>
+
           <div className="mt-4 text-2xl font-bold text-darkpurple">
             Players Joining...
           </div>
@@ -210,7 +152,7 @@ function Host_Create_Game({
                     <img
                       className="size-24 rounded-full"
                       // src={`/author_images/${player.name}.png`}
-                      src={`${backendURL}/api/author/images?game_code=${sessionStorage.getItem("game_code")}&player_name=${player.name}`}
+                      src={`/author_images/${player.name}.png`}
                       alt="profile picture"
                     />
                   </div>

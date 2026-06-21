@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { navigateTo } from "../../utils/navigate";
 
 const client: Socket = io(backendURL, {
-  transports: ["websocket"],
+    transports: ["polling", "websocket"],
 });
 
 export default client;
@@ -19,8 +19,7 @@ export function leaveGame() {
 
 export function endGame() {
   client.emit("end-game", {
-    game_code: sessionStorage.getItem("game_code"),
-    game_token: sessionStorage.getItem("game_token"),
+
   });
   navigateTo("/");
   // TODO: show results?

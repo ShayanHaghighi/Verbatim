@@ -21,7 +21,6 @@ export default function quoteHelper() {
     author_id?: number
   ): Promise<void> {
     if (!token) {
-      navigate("/login");
       return Promise.reject();
     }
     return new Promise<void>((resolve, reject) => {

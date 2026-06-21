@@ -1,6 +1,9 @@
 from random import SystemRandom,sample
 from string import ascii_uppercase,digits
 from ..models.Deck import Deck
+from ..new_dbmanagement.db_management import get_random_quotes,get_all_player_names
+from ..new_dbmanagement.models import Quote,Player
+
 GAME_CODE_LENGTH = 6
 
 games:dict = {}
@@ -8,10 +11,7 @@ games:dict = {}
 WAITING,QUESTION,ANSWER,REBUTTAL,RESULTS = [0,1,2,3,4]
 
 class Game():
-    def __init__(self,deck:Deck,num_questions=1,password=None) -> None:
-        self.game_code = gen_code()
-        self.password = password # not implemented yet
-        self.allow_midway_joining = True # not implemented yet
+    def __init__(self,num_questions=1) -> None:
         self.time_limit = 30 # not implemented yet
         self.players:dict = {}
         self.owner_sid = None
@@ -19,16 +19,17 @@ class Game():
         self.current_q_index = 0
         self.state = WAITING
         self.num_questions = num_questions
-        self.questions = sample(deck.get_quotes(),num_questions)
-        self.author_votes = {author:0 for author in deck.get_authors()}
-        self.deck_id = deck.id
-        # other options here
+        self.questions = get_random_quotes(num_questions)
+        self.author_votes = {author:0 for author in get_all_player_names()}
 
     def get_player_names(self):
         return [player.name for player in self.players.values()]
     
     def get_players(self):
         return [{"name":player.name,"score":player.score,"score_increase":player.get_score_increase()} for player in self.players.values()]
+
+    def get_current_question(self):
+        return self.questions[self.current_q_index]
 
     def get_available_names(self):
         available_players = []
@@ -44,6 +45,8 @@ class Player():
         self.score_list = [0,]
         
     def get_score_increase(self):
+        if len(self.score_list )< 2:
+            return 0
         return self.score_list[-1] - self.score_list[-2]
 
 def gen_code():

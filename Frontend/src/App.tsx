@@ -1,6 +1,5 @@
 import { createContext, useEffect } from "react";
 
-import useToken from "./pages/auth/token";
 import "./global.css";
 import MyRoutes from "./routing";
 import Navbar from "./components/navbar";
@@ -26,13 +25,9 @@ function App() {
   // const { token, removeToken, setToken } = useToken();
 
   return (
-    <TokenContext.Provider value={useToken()}>
-      {/* <SetTokenContext.Provider value={setToken}> */}
       <Navbar>
         <MyRoutes />
       </Navbar>
-      {/* </SetTokenContext.Provider> */}
-    </TokenContext.Provider>
   );
 }
 

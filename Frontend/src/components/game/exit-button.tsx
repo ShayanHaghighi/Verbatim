@@ -6,9 +6,9 @@ export default function ExitButton({ onConfirm }: { onConfirm: () => void }) {
 
   return (
     <>
-      <div className="w-full absolute bottom-0">
+      <div className="w-full absolute bottom-0 pointer-events-none">
         <button
-          className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 rounded-tr-full"
+          className="bg-accent1 hover:brightness-75 text-white pt-3 pb-2 pl-6 pr-10 pointer-events-auto rounded-tr-full"
           onClick={() => setIsModalOpen(true)}
         >
           exit

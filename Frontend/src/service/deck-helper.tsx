@@ -13,7 +13,6 @@ export default function deckHelper() {
 
   async function getAllDecks(): Promise<IDeckShort[]> {
     if (!token) {
-      navigate("/login");
       return Promise.reject();
     }
     return new Promise<IDeck[]>((resolve, reject) => {
@@ -62,7 +61,6 @@ export default function deckHelper() {
   // return the results (status code/message)
   async function createDeck(deckName: string): Promise<void> {
     if (!token) {
-      navigate("/login");
       return Promise.reject();
     }
     return new Promise<void>((resolve, reject) => {
@@ -108,5 +106,30 @@ export default function deckHelper() {
   function update_deck() {}
 
   return { getAllDecks, createDeck, getDeck };
+
+
+    async function getDeck(deckId: number): Promise<IDeck> {
+        if (!token) {
+            navigate("/login");
+            return Promise.reject();
+        }
+        return new Promise<IDeck>((resolve, reject) => {
+            axios({
+                method: "GET",
+                url: `/api/deck/${deckId}`,
+                ...getHeader(),
+            })
+                .then((response) => {
+                    response.data.access_token && setToken(response.data.access_token);
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    // console.log(error.response.status);
+                    // console.log(token);
+                    checkUnauthorised(error);
+                    reject(error);
+                });
+        });
+    }
 }
 // feel free to add more functions to help you

@@ -31,20 +31,10 @@ function Game_Owner() {
   const [questionNum, setQuestionNum] = useState("0/1");
 
   const navigate = useNavigate();
-  useEffect(() => {
-    if (sessionStorage.getItem("game_code")) {
-      console.log("asking for updates");
-      client.emit("update", {
-        game_token: sessionStorage.getItem("game_token"),
-        game_code: sessionStorage.getItem("game_code"),
-      });
-    }
-  }, []);
 
   function start_game() {
     client.emit("start-game", {
       game_code: gameCode,
-      game_token: sessionStorage.getItem("game_token"),
     });
   }
 
@@ -57,57 +47,9 @@ function Game_Owner() {
       setQuestionNum(res.question_no);
     });
 
-    client.on("update", (data) => {
-      setGameCode(sessionStorage.getItem("game_code"));
-      setGameState({ state: data.state });
-      switch (data.state) {
-        case "waiting": {
-          // TODO change players object to incorporate 'hasAnswered'
-          let temp: Player[] = [];
-          data.players.forEach((player_name: any) => {
-            temp.push({
-              name: player_name,
-              score: 0,
-              hasAnswered: false,
-              scoreIncrease: 0,
-            });
-          });
-          setPlayersJoined(temp);
-          break;
-        }
-        case "question": {
-          setCurrentQuestion({
-            question: data.question.question,
-            options: data.question.options,
-          });
-          break;
-        }
-        case "answer": {
-          setPlayersJoined(data.scores);
-          break;
-        }
-        case "rebuttal": {
-          setCurrentQuestion({
-            question: data.question.quote,
-            answer: data.question.author,
-          });
-          setCurrentVotes([]);
-          break;
-        }
-        case "results": {
-          setAuthorVotes(data.authorVotes);
-          break;
-        }
-      }
-    });
 
-    client.on("code", (data) => {
-      console.log("Received message:", data);
-      setGameCode(data.game_code);
-      sessionStorage.setItem("game_code", data.game_code);
 
-      sessionStorage.setItem("game_token", data.game_token);
-    });
+
     client.on("players-update", (data) => {
       console.log("Update to players:", data.players);
       let temp: Player[] = [];
@@ -121,20 +63,7 @@ function Game_Owner() {
       });
       setPlayersJoined(temp);
     });
-    // client.on("updated-players", (res) => {
-    //   let temp: Player[] = [];
-    //   console.log("updated-players");
-    //   console.log(res);
-    //   res.forEach((player: any) => {
-    //     temp.push({
-    //       name: player.name,
-    //       score: player.score,
-    //       hasAnswered: false,
-    //       scoreIncrease: player.score_increase,
-    //     });
-    //   });
-    //   setPlayersJoined(temp);
-    // });
+
 
     client.on("connect_error", (error) => {
       console.error("Connection error:", error);

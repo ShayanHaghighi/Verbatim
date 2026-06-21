@@ -70,7 +70,7 @@ export default function Accused({
               <img
                 className="size-[50vw] max-w-[40vh] max-h-[40vh]  rounded-full"
                 alt="accused player profile picture"
-                src={`${backendURL}/api/author/images?game_code=${sessionStorage.getItem("game_code")}&player_name=${currentAccused}`}
+                src={`/author_images/${currentAccused}.png`}
               />
             </div>
           </div>

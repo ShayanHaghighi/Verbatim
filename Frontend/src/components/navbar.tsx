@@ -31,22 +31,22 @@ export default function Navbar(props: any) {
   return (
     <>
       <div className="flex flex-col h-full w-full">
-        <div className="bg-darkpurple flex flex-row p-4 max-h-[15vh] justify-between items-center">
-          <div className="flex flex-row">
-            <BurgerMenu burgerOpen={burgerOpen} setBurgerOpen={setBurgerOpen} />
-            <div className="w-4"></div>
-            <ThemeToggle />
-          </div>
+        {/*<div className="bg-darkpurple flex flex-row p-4 max-h-[15vh] justify-between items-center">*/}
+        {/*  <div className="flex flex-row">*/}
+        {/*    <BurgerMenu burgerOpen={burgerOpen} setBurgerOpen={setBurgerOpen} />*/}
+        {/*    <div className="w-4"></div>*/}
+        {/*    <ThemeToggle />*/}
+        {/*  </div>*/}
 
-          <div
-            onClick={() => navigate("/")}
-            className="text-white text-2xl font-bold cursor-pointer select-none"
-          >
-            Verbatim
-          </div>
-        </div>
+        {/*  <div*/}
+        {/*    onClick={() => navigate("/")}*/}
+        {/*    className="text-white text-2xl font-bold cursor-pointer select-none"*/}
+        {/*  >*/}
+        {/*    Verbatim*/}
+        {/*  </div>*/}
+        {/*</div>*/}
         <div className="relative flex flex-row flex-1 ">
-          {true && (
+
             <div
               className={`z-10 absolute ${location.pathname == "/game/play" || location.pathname == "/game/host" ? (burgerOpen ? "absolute " : "hidden") : "md:static"} h-full flex flex-col bg-[#210067] items-center justify-center ${burgerOpen ? "w-[100vw] left-0" : "w-[0vw] left-[-100px]"} transition-all duration-500 md:w-1/4 md:min-w-[25%] font-josefin`}
             >
@@ -124,62 +124,40 @@ export default function Navbar(props: any) {
                         </span>
                       </div>
                     </div>
-                    <div
-                      id="loggedOutIcons"
-                      className={`pt-10 ${isAuthenticated && "hidden"}`}
-                    >
-                      {!(
-                        location.pathname == "/login" ||
-                        location.pathname == "/signup"
-                      ) && (
-                        <div
-                          onClick={() => {
-                            navigate("/login");
-                            setBurgerOpen(false);
-                          }}
-                          className="flex flex-row  items-center px-10 py-4 cursor-pointer"
-                        >
-                          <CiLogin className="mr-6 w-6 h-auto" />
-                          <span>Login</span>
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
               </div>
               {(location.pathname == "/login" ||
                 location.pathname == "/signup") && (
-                <div className="flex flex-col items-center justify-evenly py-10 text-center bg-[#29096B] text-white h-full w-full">
-                  <div className="font-bold px-2 text-[200%]">
-                    Welcome back!
+                  <div className="flex flex-col items-center justify-evenly py-10 text-center bg-[#29096B] text-white h-full w-full">
+                    <div className="font-bold px-2 text-[200%]">
+                      Welcome back!
+                    </div>
+                    <div className="text-sm md:text-lg font-light px-4">
+                      got a new quote you want to add?
+                    </div>
+                    {location.pathname == "/login" && (
+                      <button
+                        onClick={() => {
+                          navigate("/signup");
+                        }}
+                        className="btn-line"
+                      >
+                        SIGN UP
+                      </button>
+                    )}
+                    {location.pathname == "/signup" && (
+                      <button
+                        onClick={() => {
+                        }}
+                        className="btn-line"
+                      >
+                        LOG IN
+                      </button>
+                    )}
                   </div>
-                  <div className="text-sm md:text-lg font-light px-4">
-                    got a new quote you want to add?
-                  </div>
-                  {location.pathname == "/login" && (
-                    <button
-                      onClick={() => {
-                        navigate("/signup");
-                      }}
-                      className="btn-line"
-                    >
-                      SIGN UP
-                    </button>
-                  )}
-                  {location.pathname == "/signup" && (
-                    <button
-                      onClick={() => {
-                        navigate("/login");
-                      }}
-                      className="btn-line"
-                    >
-                      LOG IN
-                    </button>
-                  )}
-                </div>
-              )}
+                )}
             </div>
-          )}
           {props.children}
         </div>
       </div>

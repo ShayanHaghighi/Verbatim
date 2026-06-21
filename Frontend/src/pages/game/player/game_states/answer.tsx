@@ -6,19 +6,19 @@ import { motion } from "framer-motion";
 import ProgressBar from "../../../../components/game/progress-bar";
 import ScoreComponent from "../../../../components/game/score-component";
 import GameHeaderWait from "../../../../components/game/game-header-wait";
+import {Answer, GameStats} from "../game-player.tsx";
+import {gameStates} from "../../game-models.tsx";
 
-export default function PlayerAnswer({
-  isAnswerCorrect,
-  questionNum,
-  score,
-  currentAccused,
-}: {
-  isAnswerCorrect: boolean | null;
-  questionNum: string;
-  score: number;
-  currentAccused: string | null;
-}) {
-  const [scoreIncrease, setScoreIncrease] = useState(0);
+export function get_question_progress(gameStats: GameStats) {
+    return `${gameStats.question_number}/${gameStats.total_questions}`;
+}
+
+export default function PlayerAnswer(
+    {answer,gameStats}
+:
+    { answer: Answer ,gameStats :GameStats,},
+) {
+
 
   const objects = [
     { id: 2, x: -250, y: -175, rotate: 45 },
@@ -33,29 +33,15 @@ export default function PlayerAnswer({
 
   // Define motion variants for animation
 
-  useEffect(() => {
-    client.on("score-increase", (res) => {
-      setScoreIncrease(res.increase);
-    });
-    client.emit("get-increase", {
-      game_code: sessionStorage.getItem("game_code"),
-      game_token: sessionStorage.getItem("game_token"),
-    });
-    client.emit("current-game-info", {
-      game_code: sessionStorage.getItem("game_code"),
-      game_token: sessionStorage.getItem("game_token"),
-    }),
-      [];
-  });
   return (
     <>
       <div className="w-full h-full bg-accent2">
         <GameHeaderWait
-          score={score}
-          questionNum={questionNum}
+          score={gameStats.score}
+          questionNum={get_question_progress(gameStats)}
           displayText="It was:"
         />
-        <div className="relative">
+        <div className="relative mt-20">
           <div className="absolute w-full h-full scale-[0.5] -translate-y-[5%] sm:translate-y-0 sm:scale-100 flex items-center justify-center ">
             {objects.map((obj, index) => (
               <motion.div
@@ -100,26 +86,26 @@ export default function PlayerAnswer({
           </div>
           <div className="w-full flex flex-col items-center justify-center mt-8">
             <div
-              className={`${scoreIncrease > 0 ? "bg-green-500" : "bg-red-600"} w-fit h-fit rounded-full p-4 shadow-2xl`}
+              className={`${answer.score_increase > 0 ? "bg-green-500" : "bg-red-600"} w-fit h-fit rounded-full p-4 shadow-2xl`}
             >
               <div className="bg-zinc-100 w-fit h-fit rounded-full shadow-lg">
                 <img
                   className="size-[50vw] max-w-[40vh] max-h-[40vh]  rounded-full"
                   alt="accused player profile picture"
-                  src={`${backendURL}/api/author/images?game_code=${sessionStorage.getItem("game_code")}&player_name=${currentAccused}`}
+                  src={`/author_images/${answer.answer}.png`}
                 />
               </div>
             </div>
             <span
-              className={`${scoreIncrease > 0 ? "text-green-300" : "text-red-400"} text-[3rem] mt-4 mild-shadow`}
+              className={`${answer.score_increase > 0 ? "text-green-300" : "text-red-400"} text-[3rem] mt-4 mild-shadow`}
             >
-              {currentAccused}
+              {answer.answer}
             </span>
           </div>
 
           <div className="w-full flex p-6 justify-center items-center">
             <span className="text-white text-xl flex flex-row">
-              <span>+ {scoreIncrease}</span>
+              <span>+ {answer.score_increase}</span>
               <img
                 src={"/icons/checkpoint.png"}
                 alt="checkpoint image"

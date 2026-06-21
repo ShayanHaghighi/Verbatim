@@ -7,6 +7,7 @@ import useWindowDimensions from "../../../../components/window-dimentions";
 import { backendURL } from "../../../../constants";
 import "./rebuttal.css";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import BackgroundMusic from "../../../../components/background-music.tsx";
 interface props {
   gameCode: string | null;
   accusedName: string;
@@ -229,6 +230,12 @@ export default function HostRebuttal({
   return (
     <>
       {/* <div className="game-bg relative z-0"> */}
+      {/*  <audio*/}
+      {/*      src="/music/objection-OST.mp3"*/}
+      {/*      autoPlay*/}
+      {/*      loop*/}
+      {/*  />*/}
+        <BackgroundMusic url={"/music/objection-OST.mp3"} loop={true}/>
       {showingAnimation ? (
         <div className="game-bg relative max-w-full">
           <img
@@ -312,7 +319,7 @@ export default function HostRebuttal({
                   <div className="bg-white w-fit h-fit rounded-full">
                     <img
                       key={player.name}
-                      src={`${backendURL}/api/author/images?game_code=${sessionStorage.getItem("game_code")}&player_name=${player.name}`}
+                      src={`/author_images/${player.name}.png`}
                       className={`size-16 min-w-16 md:size-20 rounded-full`}
                     />
                   </div>

@@ -4,7 +4,7 @@ import ScoreComponent from "./score-component";
 interface GameHeaderProps {
   score: number;
   questionNum: string;
-  displayText: string;
+  displayText: any;
 }
 
 export default function GameHeaderWait({

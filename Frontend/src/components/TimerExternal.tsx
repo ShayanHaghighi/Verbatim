@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 
 interface CountdownTimerExternalProps {
   onFinish: () => void;
-  timeLeft: number;
+  timeLeft: number | undefined;
   setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
 }
 
-function CountdownTimerExternal({
+export default function CountdownTimerExternal({
   onFinish,
   timeLeft,
   setTimeLeft,
@@ -26,7 +26,7 @@ function CountdownTimerExternal({
     return () => clearInterval(timerId);
   }, [timeLeft, onFinish]);
 
-  function formatTime(timeLeft: number) {
+  function formatTime(timeLeft: number | undefined): string {
     let secondsLeft = Math.ceil(timeLeft % 60);
     let minutesLeft = Math.max(Math.floor(timeLeft / 60), 0);
     return `${String(minutesLeft).padStart(2, "0")}:${String(secondsLeft).padStart(2, "0")}`;
@@ -39,4 +39,3 @@ function CountdownTimerExternal({
   );
 }
 
-export default CountdownTimerExternal;

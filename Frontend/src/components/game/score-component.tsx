@@ -1,4 +1,4 @@
-export default function ScoreComponent({ score }: { score: number }) {
+export default function ScoreComponent({ score }: { score: number | undefined }) {
   return (
     <div className="flex items-start">
       <div className="flex flex-row justify-center py-2 px-2 bg-accent2 text-white shadow-lg rounded-full w-28 min-w-fit">

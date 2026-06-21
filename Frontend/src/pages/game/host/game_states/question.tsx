@@ -1,61 +1,15 @@
 import { Player, Question } from "../../game-models";
+import {useEffect, useState} from "react";
+import ProgressBar from "../../../../components/game/progress-bar.tsx";
+import CountdownTimerExternal from "../../../../components/TimerExternal.tsx";
+import client from "../../socket-connection.ts";
+import {playMusic, sample} from "./answer.tsx";
+import BackgroundMusic from "../../../../components/background-music.tsx";
 
-// function Host_Question({ question, game_code, players }: props) {
-
-//   return (
-//     <>
-{
-  /* {question?.question}
-      {question?.options == null ? (
-        <span>error - no options</span>
-      ) : (
-        <ul>
-          {question?.options.map((option) => (
-            <li key={option}>{option}</li>
-          ))}
-        </ul>
-      )}
-      <button onClick={endRound}>Next round</button>
-      <ul>
-        {players.map((player) =>
-          player.hasAnswered ? (
-            <li key={player.name}>{player.name} has answered</li>
-          ) : (
-            <></>
-          )
-        )}
-      </ul> */
-}
-//     </>
-//   );
-// }
-
-import { useEffect, useState } from "react";
-import CountdownTimerExternal from "../../../../components/TimerExternal";
-import { backendURL } from "../../../../constants";
-import ProgressBar from "../../../../components/game/progress-bar";
-import client, { endGame } from "../../socket-connection";
-import ExitButton from "../../../../components/game/exit-button";
-
-export function setUpQuestionHandlers({
-  setAnswerCorrect,
-  setCurrentQuestion,
-  setGameState,
-  setTimeLimit,
-  setCurrentScore,
-}: any) {
-  client.on("question", (res) => {
-    console.log("game has started");
-    setTimeLimit(res.time_limit);
-    setCurrentQuestion({ question: res.question, options: res.options });
-    setGameState({ state: "question" });
-    // setCurrentScore(res.score);
-  });
-  client.on("answer-correctness", (res) => {
-    console.log(res.isCorrect);
-    setAnswerCorrect(res.isCorrect);
-  });
-}
+const music = [
+    "/music/suspense/AA-1.mp3",
+    "/music/suspense/AA-2.mp3",
+]
 
 function Host_Question({
   game_code,
@@ -85,7 +39,7 @@ function Host_Question({
   // ];
 
   function endRound() {
-    client.emit("question-finished", {
+    client.emit("question-end", {
       game_code: game_code,
       game_token: sessionStorage.getItem("game_token"),
     });
@@ -93,6 +47,7 @@ function Host_Question({
 
   // question = { question: "quesion", options: ["op1", "op2", "op3", "op4"] };
   useEffect(() => {
+
     client.emit("current-game-info", {
       game_code: game_code,
     });
@@ -112,7 +67,9 @@ function Host_Question({
     <>
       {/* <div className="game-bg bg-accent2"> */}
       <div className="h-full w-full flex flex-col justify-between">
-        <div className="h-full w-full">
+          <BackgroundMusic url={sample(music)} loop={true}/>
+
+          <div className="h-full w-full">
           <div
             className="bg-accent1 w-full flex flex-col rounded-b-[100%] shadow-inner "
             style={{
@@ -177,7 +134,7 @@ function Host_Question({
                       <img
                         className="size-24 rounded-full"
                         // src={`/author_images/${player.name}.png`}
-                        src={`${backendURL}/api/author/images?game_code=${game_code}&player_name=${player.name}`}
+                        src={`/author_images/${player.name}.png`}
                         alt="profile picture"
                       />
                     </div>

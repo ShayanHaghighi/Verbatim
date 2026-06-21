@@ -8,6 +8,7 @@ from ..dbManagement import DeckRepository as deck_repo
 from ..dbManagement import QuoteRepository as quote_repo
 from ..dbManagement import AuthorRepository as author_repo
 from ..models.Game import games,Player,Game
+from ..new_dbmanagement.db_management import get_all_player_names
 
 IMAGE_DIR = "assets/author_images"
 
@@ -15,20 +16,12 @@ IMAGE_DIR = "assets/author_images"
 author_route = Blueprint('authors',__name__)
 
 @author_route.route('/author',methods=['GET','POST'])
-@jwt_required()
 def author_endpoint():
-    if request.method == 'GET':
-        deck_name = request.json.get("deck_name", None)
-        deck_id = request.json.get("deck_id", None)
 
-        if deck_id:
-            deck = deck_repo.get_by_id(deck_id)
-        elif deck_name:
-            deck = deck_repo.get_by_owner_id_and_name(deck_name=deck_name,owner_id=get_jwt_identity())
-        else:
-            return {"msg":"provide deck_name or deck_id"},400
-        authors = deck.to_dict()['authors']
-        return authors,200
+    if request.method == 'GET':
+        players = get_all_player_names()
+
+        return list(players),200
 
     if request.method == 'POST':
 

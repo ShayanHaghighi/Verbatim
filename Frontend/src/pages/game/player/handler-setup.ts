@@ -1,6 +1,6 @@
 import client from "../socket-connection";
 
-export function setUpHandlers({ setGameState, setCurrentAccused }: any) {
+export function setUpHandlers({ setGameState }: any) {
   client.once("connect", () => {
     console.log("Connected to server");
   });
@@ -11,15 +11,6 @@ export function setUpHandlers({ setGameState, setCurrentAccused }: any) {
     setGameState({ state: "waiting" });
   });
 
-  client.on("question-finished", (res) => {
-    setGameState({ state: "answer" });
-    setCurrentAccused(res.answer);
-  });
-
-  client.on("start-rebuttal", (res) => {
-    setCurrentAccused(res.author_name);
-    setGameState({ state: "rebuttal" });
-  });
 
   client.on("user-error", (error) => {
     console.error("User error:", error);

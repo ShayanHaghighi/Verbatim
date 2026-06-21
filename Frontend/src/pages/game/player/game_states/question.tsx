@@ -1,4 +1,4 @@
-import { Question } from "../game-player";
+import {Answer, formatQNum, GameStats, Question} from "../game-player";
 import client from "../../socket-connection";
 import { useEffect, useState } from "react";
 import CountdownTimerExternal from "../../../../components/TimerExternal";
@@ -8,60 +8,34 @@ import ProgressBar from "../../../../components/game/progress-bar";
 import ScoreComponent from "../../../../components/game/score-component";
 import GameHeader from "../../../../components/game/game-header";
 
-export function setUpQuestionHandlers({
-  setAnswerCorrect,
-  setCurrentQuestion,
-  setGameState,
-  setTimeLimit,
-  setCurrentScore,
-}: any) {
-  client.on("question", (res) => {
-    console.log("game has started");
-    setTimeLimit(res.time_limit);
-    setCurrentQuestion({ question: res.question, options: res.options });
-    setGameState({ state: "question" });
-    // setCurrentScore(res.score);
-  });
-  client.on("answer-correctness", (res) => {
-    console.log(res.isCorrect);
-    setAnswerCorrect(res.isCorrect);
-  });
-}
+const DEFAULT_TIME_LIMIT = 30
 
 function PlayerQuestion({
-  questionNum,
-  score,
+  gameStats,
   question,
-  timeLimit,
+                            playerName
 }: {
-  questionNum: string;
-  score: number;
+    playerName:string
+    gameStats: GameStats;
   question: Question | null;
-  timeLimit: number;
 }) {
   const [hasAnswered, setHasAnswered] = useState<boolean>(false);
   const [currentOption, setCurrentOption] = useState("");
   const [hasTimerRunOut, setHasTimerRunOut] = useState<boolean>(false);
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [timeLeft, setTimeLeft] = useState(question?.time_limit ?? DEFAULT_TIME_LIMIT);
 
-  // question = { question: "quesion", options: ["op1", "op2", "op3", "op4"] };
-  useEffect(() => {
-    client.emit("current-game-info", {
-      game_code: sessionStorage.getItem("game_code"),
-      game_token: sessionStorage.getItem("game_token"),
-    });
-  }, []);
 
   function submitAnswer() {
-    client.emit("my-answer", {
-      game_code: sessionStorage.getItem("game_code"),
+      console.log("time left",timeLeft)
+    client.emit("answer", {
       answer: currentOption,
-      game_token: sessionStorage.getItem("game_token"),
-      time_taken_ratio: timeLeft / timeLimit,
+      player_name: playerName,
+      time_taken_ratio: timeLeft / question?.time_limit,
     });
     setHasAnswered(true);
     console.log("answer:");
-    console.log(currentOption + "," + timeLeft / timeLimit);
+    console.log("player_name:" + playerName);
+    console.log(currentOption + "," + timeLeft / question?.time_limit);
   }
 
   function timerRanOut() {
@@ -69,22 +43,27 @@ function PlayerQuestion({
     console.log("time has run out");
   }
 
+
+
   return (
     <>
       <div className="w-full h-full bg-accent2">
+
         {hasAnswered ? (
           <WaitingScreen2 />
         ) : (
           <>
             <GameHeader
-              score={score}
-              questionNum={questionNum}
+              score={gameStats?.score}
+              questionNum={formatQNum(gameStats)}
               timerFinishedCallback={timerRanOut}
-              timeLimit={timeLimit}
+              timeLimit={question?.time_limit ?? DEFAULT_TIME_LIMIT}
+              timeLeft={timeLeft}
+              setTimeLeft={setTimeLeft}
               displayText="Who said:"
             />
-            <div className="w-full flex items-center justify-center text-white text-[4vh] font-bold drop-shadow-lg mt-8 mb-6">
-              <span className="font-indie quote-shadow select-none">
+            <div className="w-full flex items-center justify-center text-white text-4xl md:text-5xl font-bold drop-shadow-lg mt-8 mb-6">
+              <span className="font-indie quote-shadow select-none text-center px-4">
                 " {question?.question} "
               </span>
             </div>
