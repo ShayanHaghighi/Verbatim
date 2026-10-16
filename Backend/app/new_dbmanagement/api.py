@@ -8,6 +8,7 @@ def get_players():
     """
     Endpoint to get all player names.
     """
+    print("PLAYERS ENDPOINT CALLED")
     player_names = get_all_player_names()
     return jsonify(players=player_names)
 

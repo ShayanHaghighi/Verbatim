@@ -1,84 +1,107 @@
-import { motion } from "framer-motion";
-import { backendURL } from "../../../../../constants";
+import React from 'react';
 
-export default function Accused({
-  currentAccused,
-}: {
-  currentAccused: string;
-}) {
-  const objects = [
-    { id: 2, x: -250, y: -175, rotate: 45 },
-    { id: 6, x: -300, y: 0, rotate: 0 },
-    { id: 1, x: -250, y: 175, rotate: -45 },
+const RevealScreen = ({ guesses, actualAuthor }) => {
+    const correctPlayers = [];
+    const incorrectPlayers = [];
 
-    { id: 3, x: 250, y: -175, rotate: 135 },
-    { id: 4, x: 300, y: 0, rotate: 180 },
-    { id: 5, x: 250, y: 175, rotate: 225 },
-  ];
-  const yOffset = -100;
-  console.log("current accused :" + currentAccused);
-  return (
-    <>
-      <div className="relative">
-        <div className="absolute w-full h-full scale-[0.5] -translate-y-[5%] sm:translate-y-0 sm:scale-100 flex items-center justify-center ">
-          {objects.map((obj, index) => (
-            <motion.div
-              key={obj.id}
-              custom={index}
-              initial={{
-                x: obj.x,
-                y: obj.y + yOffset,
-                rotate: `${obj.rotate}deg`,
-              }}
-              animate={{
-                x: obj.x * 1.1,
-                y: obj.y * 1.1 + yOffset,
-                transition: {
-                  duration: 1,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  delay: 0,
-                  ease: "easeInOut",
-                },
-              }}
-              // className={`${obj.id > 1 ? "md:flex hidden" : "flex"}`}
-              style={{
-                width: "100px",
-                height: "100px",
-                position: "absolute",
-                // backgroundColor: "purple",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {/* Replace with an icon or image of a pointing finger */}
-              <img
-                src={"/icons/point.png"}
-                alt="checkpoint image"
-                className="size-20"
-              ></img>
-            </motion.div>
-          ))}
-        </div>
-        <div className="w-full flex flex-col items-center justify-center mt-8">
-          <div
-            className={`bg-green-500  w-fit h-fit rounded-full p-4 shadow-2xl`}
-          >
-            <div className="bg-zinc-100 w-fit h-fit rounded-full shadow-lg">
-              <img
-                className="size-[50vw] max-w-[40vh] max-h-[40vh]  rounded-full"
-                alt="accused player profile picture"
-                src={`/author_images/${currentAccused}.png`}
-              />
+    // Sort players based on their guesses
+    Object.entries(guesses).forEach(([player, guess]) => {
+        if (guess.toLowerCase() === actualAuthor.toLowerCase()) {
+            correctPlayers.push(player);
+        } else {
+            incorrectPlayers.push({ player, guess });
+        }
+    });
+
+    return (
+        // Replaced min-h-screen with h-full and flex-wrap to play nicely with a top-bar
+        <div className=" h-full w-full p-8 flex justify-between items-start  px-36">
+
+            {/* LEFT & MIDDLE: Grouped the Accused and Correct Guessers so they sit closer together */}
+            {/*<div className="flex items-center flex-row gap-6 md:gap-12 flex-1">*/}
+
+                {/* The Accused (Actual Author) */}
+                    <div className="w-64 h-64 bg-gray-300 rounded-full flex items-center justify-center text-2xl md:text-3xl font-bold text-center p-6 shadow-lg flex-shrink-0 bg-white w-fit h-fit rounded-full border border-[5px] border-red-500 pulse-float">
+                        <img
+                            src={`/author_images/${"Barry"}.png`}
+                            className={`size-64 min-w-64 min-h-64 rounded-full big-shadow`}
+                        />
+                    </div>
+
+                {/* Correct Guessers (Now wrap automatically if there are too many) */}
+                <div className="grid grid-flow-col grid-rows-3 flex-wrap gap-6 justify-start items-start">
+                    {correctPlayers.map((player) => (
+                        <div key={player} className="flex items-center gap-2">
+                            <span className="text-5xl md:text-6xl">👈</span>
+                            <div className="bg-white w-fit h-fit rounded-full border border-[8px] border-green-500">
+                                <img
+                                    src={`/author_images/${"Barry"}.png`}
+                                    className={`size-32 min-w-32 min-h-32 rounded-full big-shadow`}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            {/*</div>*/}
+
+            {/* FAR RIGHT: Incorrect Guessers */}
+            <div className="grid grid-flow-row grid-cols-3 flex-wrap gap-x-20 gap-y-28 justify-center items-start lg:justify-end  mt-20 lg:mt-0 pt-8">
+                {incorrectPlayers.map(({ player, guess }) => (
+                    <div key={player} className="relative flex flex-col items-center mt-2">
+
+                        {/* Thought Bubble - Made slightly bigger and adjusted positioning */}
+                        <div className="absolute -top-28 -right-24 flex flex-col items-center z-10">
+                            <div className="relative flex justify-center items-center w-[180px] h-[130px]">
+
+                                {/* SVG Cloud Outline */}
+                                <svg viewBox="0 0 120 80" className="absolute -top-16 -left-7 size-60 -z-10">
+                                    <path
+                                        d="M 35 65
+                       C 15 65, 15 35, 35 35
+                       C 40 15, 80 15, 85 35
+                       C 105 35, 105 65, 85 65
+                       Z"
+                                        fill="white" /* Matches Tailwind background */
+                                        stroke="white"
+                                        strokeWidth="4"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+
+                                {/* Incorrect Guess Circle Inside Cloud */}
+                                <img
+                                    key={player.name}
+                                    src={`/author_images/Bobby.png`}
+                                    className={`size-16 min-w-16 md:size-20 rounded-full z-10`}
+                                 alt={"abc"}/>
+                            </div>
+
+                            {/* Bubble Trail */}
+                            <div className="absolute -bottom-6 left-8 flex flex-col items-start gap-1">
+                                <div className="w-5 h-5 rounded-full border-[3px] border-black bg-white"></div>
+                                <div className="w-3 h-3 rounded-full border-[3px] border-black bg-white -ml-2"></div>
+                            </div>
+                        </div>
+
+                        {/* Player Circle */}
+
+                            <div className="bg-white w-fit h-fit rounded-full border border-[8px] border-red-500">
+                                <img
+                                    src={`/author_images/${"Barry"}.png`}
+                                    className={`size-32 min-w-32 min-h-32 rounded-full big-shadow`}
+                                />
+                            </div>
+                        {/* <img
+            src="/author_images/Billy.png"
+            className="absolute top-[50%] right-[50vh] transform animate-float size-8 -translate-x-1/2 -translate-y-1/2 object-right"
+          /> */}
+
+                    </div>
+                ))}
             </div>
-          </div>
-          <span className={` text-green-300  text-[3rem] mt-4 mild-shadow`}>
-            {currentAccused}
-          </span>
+
         </div>
-      </div>
-    </>
-  );
-}
+    );
+};
+
+export default RevealScreen;

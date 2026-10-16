@@ -1,0 +1,13 @@
+<svg viewBox="0 0 120 80" width="140" height="100">
+<path
+d="M 35 65
+                       C 15 65, 15 35, 35 35
+                       C 40 15, 80 15, 85 35
+                       C 105 35, 105 65, 85 65
+                       Z"
+fill="#8a2be2"
+        stroke="black"
+        strokeWidth="4"
+        strokeLinejoin="round"
+        />
+</svg>

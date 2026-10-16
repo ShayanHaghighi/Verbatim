@@ -5,7 +5,7 @@ import random
 from .models import Base, Player, Quote, QuoteModel
 
 # --- Database Setup ---
-DB_FILE = "new_db.sqlite"
+DB_FILE = "quotes_db.sqlite"
 engine = create_engine(f"sqlite:///{DB_FILE}")
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
@@ -18,28 +18,28 @@ def init_db():
     session = DBSession()
     session.expire_on_commit = False
     # Prevent re-populating with the same data
-    if session.query(Player).count() == 0:
-        # Add sample players
-        player1 = Player(name="Billy")
-        player2 = Player(name="Barry")
-        player3 = Player(name="Bobby")
-
-
-
-        session.add_all([player1, player2,player3])
-        session.commit()
-
-        # Add sample quotes
-        quotes_data = [
-            {"player": player1, "quote_text": "The only way to do great work is to love what you do."},
-            {"player": player3, "quote_text": "Strive not to be a success, but rather to be of value."},
-            {"player": player2, "quote_text": "The mind is everything. What you think you become."},
-            {"player": player2, "quote_text": "An unexamined life is not worth living."},
-            {"player": player1, "quote_text": "I have not failed. I've just found 10,000 ways that won't work."},
-        ]
-        for q in quotes_data:
-            session.add(Quote(**q))
-        session.commit()
+    # if session.query(Player).count() == 0:
+    #     # Add sample players
+    #     player1 = Player(name="Billy")
+    #     player2 = Player(name="Barry")
+    #     player3 = Player(name="Bobby")
+    #
+    #
+    #
+    #     session.add_all([player1, player2,player3])
+    #     session.commit()
+    #
+    #     # Add sample quotes
+    #     quotes_data = [
+    #         {"player": player1, "quote_text": "The only way to do great work is to love what you do."},
+    #         {"player": player3, "quote_text": "Strive not to be a success, but rather to be of value."},
+    #         {"player": player2, "quote_text": "The mind is everything. What you think you become."},
+    #         {"player": player2, "quote_text": "An unexamined life is not worth living."},
+    #         {"player": player1, "quote_text": "I have not failed. I've just found 10,000 ways that won't work."},
+    #     ]
+    #     for q in quotes_data:
+    #         session.add(Quote(**q))
+    #     session.commit()
 
     session.close()
 

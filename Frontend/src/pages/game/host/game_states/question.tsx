@@ -78,13 +78,8 @@ function Host_Question({
           >
             <div className="flex h-24 flex-row justify-between p-4">
               <div className="flex items-start opacity-0">
-                <div className="flex flex-row justify-center py-2 px-2 bg-accent2 text-white shadow-lg rounded-full w-28 min-w-fit">
-                  <img
-                    src={"/icons/checkpoint.png"}
-                    alt="checkpoint image"
-                    className="size-6 mr-1"
-                  ></img>
-                  <div>1111 pts</div>
+                <div className="flex flex-row justify-center py-2 px-2 bg-accent2 text-white shadow-lg rounded-full w-28 min-w-fit opacity-0">
+
                 </div>
               </div>
               <ProgressBar questionNum={questionNum} />

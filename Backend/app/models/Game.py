@@ -1,8 +1,6 @@
 from random import SystemRandom,sample
 from string import ascii_uppercase,digits
-from ..models.Deck import Deck
 from ..new_dbmanagement.db_management import get_random_quotes,get_all_player_names
-from ..new_dbmanagement.models import Quote,Player
 
 GAME_CODE_LENGTH = 6
 
@@ -18,7 +16,7 @@ class Game():
         self.owner_token = None
         self.current_q_index = 0
         self.state = WAITING
-        self.num_questions = num_questions
+        self.num_questions = int(num_questions)
         self.questions = get_random_quotes(num_questions)
         self.author_votes = {author:0 for author in get_all_player_names()}
 
@@ -26,7 +24,7 @@ class Game():
         return [player.name for player in self.players.values()]
     
     def get_players(self):
-        return [{"name":player.name,"score":player.score,"score_increase":player.get_score_increase()} for player in self.players.values()]
+        return [{"name":player.name,"score":player.score,"score_increase":player.get_score_increase(),"has_answered":player.has_answered} for player in self.players.values()]
 
     def get_current_question(self):
         return self.questions[self.current_q_index]
@@ -43,6 +41,7 @@ class Player():
         self.name: str = player_name
         self.score = 0
         self.score_list = [0,]
+        self.has_answered: bool = False
         
     def get_score_increase(self):
         if len(self.score_list )< 2:

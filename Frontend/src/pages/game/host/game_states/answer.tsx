@@ -8,6 +8,7 @@ import ProgressBar from "../../../../components/game/progress-bar";
 import ExitButton from "../../../../components/game/exit-button";
 import {Shake} from "reshake";
 import {tr} from "framer-motion/client";
+import RevealScreen from "./sub-states/accused";
 
 interface props {
     gameCode: string | null;
@@ -46,14 +47,16 @@ export default function HostAnswer({
                                        currentAccused,
                                        questionNum,
                                    }: props) {
-    // players = [
-    //   { name: "billy", score: 1273, scoreIncrease: 561, hasAnswered: false },
-    //   { name: "barry", score: 1205, scoreIncrease: 700, hasAnswered: false },
-    //   { name: "benny", score: 1315, scoreIncrease: 1090, hasAnswered: false },
-    //   { name: "bobby", score: 1298, scoreIncrease: 901, hasAnswered: false },
-    //   { name: "baldy", score: 900, scoreIncrease: 0, hasAnswered: false },
-    //   { name: "john", score: 1100, scoreIncrease: 811, hasAnswered: false },
-    // ];
+    players = [
+      { name: "billy", score: 1273, scoreIncrease: 561, hasAnswered: false },
+      { name: "barry", score: 1205, scoreIncrease: 700, hasAnswered: false },
+      { name: "benny", score: 1315, scoreIncrease: 1090, hasAnswered: false },
+      { name: "bobby", score: 1298, scoreIncrease: 901, hasAnswered: false },
+        { name: "arry", score: 0, scoreIncrease: 811, hasAnswered: false },
+        { name: "bandy", score: 2811, scoreIncrease: 2811, hasAnswered: false },
+        { name: "baldy", score: 900, scoreIncrease: 0, hasAnswered: false },
+      { name: "john", score: 1100, scoreIncrease: 811, hasAnswered: false },
+    ];
     const [showFirstDiv, setShowFirstDiv] = useState(true);
     const [objectionScreen, setObjectionScreen] = useState(false);
     const [shakeVelocity, setShakeVelocity] = useState(0.01);
@@ -87,7 +90,7 @@ export default function HostAnswer({
             game_code: sessionStorage.getItem("game_code"),
         });
         const timer = setTimeout(() => {
-            setShowFirstDiv(false);
+            // setShowFirstDiv(false);
         }, 4000);
         console.log("running useffevt")
         playMusic(sample(impactSounds));
@@ -171,7 +174,25 @@ export default function HostAnswer({
                             transition={{duration: 1}}
                             className="absolute w-full h-full"
                         >
-                            <Accused currentAccused={currentAccused}/>
+                            <RevealScreen
+                                actualAuthor="Michael Scott"
+                                guesses={{
+                                    "Jim": "Michael Scott",
+                                    "Jism": "Michaels Scott",
+                                    "Jima": "Michaels Scott",
+                                    "Jisdm": "Michaels Scott",
+                                    "Jiasdm": "Michaels Scott",
+                                    "Jism": "Michael Scott",
+                                    "Jism": "Michael Scott",
+                                    "Jissdfm": "Michael Scott",
+                                    "Jism": "Michael Scott",
+                                    "Jiassdam": "Michael Scott",
+                                    "Jims": "Michael Scott",
+                                    "Pam": "Michael Scott",
+                                    "Dwight": "Winston Churchill",
+                                    "Creed": "Abraham Lincoln"
+                                }}
+                            />
                         </motion.div>
                     ) : (
                         <motion.div

@@ -8,6 +8,7 @@ import PlayerRebuttal from "./game_states/rebuttal";
 import Player_Join from "./game_states/joining";
 import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../../components/game/confirm-modal";
+import WaitingScreen from "../../../components/waiting-screen.tsx";
 
 export interface FormData {
   name: string;
@@ -102,7 +103,7 @@ function Game_Player() {
           setGameState={setGameState}
         ></Player_Join>
       )}
-      {gameState.state == "waiting" && <Player_Waiting></Player_Waiting>}
+      {gameState.state == "waiting" && <WaitingScreen player_name={playerName}></WaitingScreen>}
       {gameState.state == "question" && (
         <PlayerQuestion
             playerName={playerName}

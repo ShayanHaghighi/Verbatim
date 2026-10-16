@@ -22,7 +22,7 @@ interface FormData {
 function Game_Owner() {
   const [gameCode, setGameCode] = useState<string | null>(null);
   const [playersJoined, setPlayersJoined] = useState<Player[]>([]);
-  const [gameState, setGameState] = useState<gameStates>({ state: "waiting" });
+  const [gameState, setGameState] = useState<gameStates>({ state: "answer" });
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [currentVotes, setCurrentVotes] = useState<Vote[]>([]);
   const [currentAccused, setCurrentAccused] = useState("");
@@ -53,12 +53,12 @@ function Game_Owner() {
     client.on("players-update", (data) => {
       console.log("Update to players:", data.players);
       let temp: Player[] = [];
-      data.players.forEach((player_name: any) => {
+      data.players.forEach((player: any) => {
         temp.push({
-          name: player_name,
-          score: 0,
-          hasAnswered: false,
-          scoreIncrease: 0,
+          name: player.name,
+          score: player.score,
+          hasAnswered: player.has_answered,
+          scoreIncrease: player.score_increase,
         });
       });
       setPlayersJoined(temp);
@@ -78,20 +78,20 @@ function Game_Owner() {
       setGameState({ state: "question" });
       sessionStorage.setItem("state", "question");
       setTimeLimit(res.time_limit);
-      setPlayersJoined((prevPlayers) => {
-        return prevPlayers.map((player: Player) => ({
-          ...player,
-          hasAnswered: false,
-        }));
-      });
+      // setPlayersJoined((prevPlayers) => {
+      //   return prevPlayers.map((player: Player) => ({
+      //     ...player,
+      //     hasAnswered: false,
+      //   }));
+      // });
     });
-    client.on("new-answer", (res) => {
-      setPlayersJoined((prevPlayers) => {
-        return prevPlayers.map((player: Player) =>
-          player.name == res.name ? { ...player, hasAnswered: true } : player
-        );
-      });
-    });
+    // client.on("new-answer", (res) => {
+    //   setPlayersJoined((prevPlayers) => {
+    //     return prevPlayers.map((player: Player) =>
+    //       player.name == res.name ? { ...player, hasAnswered: true } : player
+    //     );
+    //   });
+    // });
 
     client.on("player-scores", (res) => {
       console.log("player-scores");

@@ -51,6 +51,7 @@ export default function HostRebuttal({
   const [filteredPlayers, setFilteredPlayers] =
     useState<Player[]>(getFilteredArray());
 
+
   useEffect(() => {
     setFilteredPlayers(getFilteredArray());
   }, players);
@@ -63,31 +64,7 @@ export default function HostRebuttal({
     setDelayArray(arr);
   });
 
-  function getYValue(yPos: number) {
-    if (heightRatio > widthRatio) {
-      return (yPos / 100) * height;
-    } else {
-      return (yPos / 100) * height + yOffset / 5;
-    }
-  }
 
-  function getXValue(xPos: number) {
-    if (heightRatio > widthRatio) {
-      return xPos * heightRatio - xOffset;
-    } else {
-      return xPos * widthRatio - xOffset;
-    }
-  }
-
-  function moveLeft() {
-    setCurrentXPos((prev) => Math.max(0, prev - 10));
-    calcOffsetValues(Math.max(0, currentXPos - 10));
-  }
-
-  function moveRight() {
-    setCurrentXPos((prev) => Math.min(100, prev + 10));
-    calcOffsetValues(Math.min(100, currentXPos + 10));
-  }
 
   useEffect(() => {
     client.emit("current-game-info", {
@@ -171,16 +148,16 @@ export default function HostRebuttal({
   // ];
   // players = ["Billy", "Bobby", "Barry", "Billy", "Bobby", "Barry", "Barry"];
   const positions = [
-    [660, 46],
-    [450, 45],
-    [270, 44],
-    [560, 52],
-    [340, 50],
-    [785, 51],
-    [150, 51],
+      [9.7, 57],
+      [17, 57],
+      [24.7, 57],
+      [5.4, 60],
+      [13.2, 60],
+      [21.2, 60],
+      [29.4, 60],
   ];
 
-  const accusedPosition = [1860, 44];
+  const accusedPosition = [68, 58];
 
   const scoreMap: { [index: number]: string } = {
     1: "happy.png",
@@ -247,20 +224,20 @@ export default function HostRebuttal({
       ) : (
         <>
           <div
-            className="bg-accent1 w-full flex flex-col rounded-b-[100%] shadow-inner absolute md:pb-0 pb-6"
+            className="bg-accent1 w-full flex flex-col rounded-b-[100%] shadow-inner absolute z-10"
             style={{
               boxShadow: "0 -20px 20px rgba(0,0,0,0.2) inset",
             }}
           >
-            <div className="flex h-24 flex-row justify-between p-4">
-              <div className="flex items-start opacity-0">
-                <div className="flex flex-row justify-center py-2 px-2 bg-accent2 text-white shadow-lg rounded-full w-28 min-w-fit">
-                  <img
-                    src={"/icons/checkpoint.png"}
-                    alt="checkpoint image"
-                    className="size-6 mr-1"
-                  ></img>
-                  <div>1111 pts</div>
+            <div className="flex w-full h-24 flex-row justify-between p-4">
+              <div className="flex items-start">
+                <div className="flex flex-row justify-center py-2 px-2 bg-accent2 text-white shadow-lg rounded-full w-28 min-w-fit opacity-0">
+                  {/*<img*/}
+                  {/*  src={"/icons/checkpoint.png"}*/}
+                  {/*  alt="checkpoint image"*/}
+                  {/*  className="size-6 mr-1"*/}
+                  {/*></img>*/}
+
                 </div>
               </div>
               <ProgressBar questionNum={questionNum} />
@@ -299,7 +276,7 @@ export default function HostRebuttal({
           <div className="relative z-0 overflow-hidden w-full h-full ">
             <img
               src="/images/court.png"
-              className="h-full w-auto min-w-full object-cover object-right transition-all absolute right-0"
+              className="h-full w-full min-w-full object-right transition-all absolute right-0"
               style={{
                 objectPosition: `${currentXPos}% 50%`,
               }}
@@ -309,9 +286,8 @@ export default function HostRebuttal({
               <div
                 className="size-fit min-w-[56px] transition-all md:min-w-[96px] rounded-full absolute animate-float object-right "
                 style={{
-                  right: `${getXValue(getXPos(index))}px`,
-                  transform: `translateX(${100}px)`,
-                  top: `${getYValue(getYPos(index))}px`,
+                  right: `${(getXPos(index))}%`,
+                  top: `${(getYPos(index))}%`,
                   animationDelay: `${delayArray[index]}s`,
                 }}
               >
@@ -329,8 +305,8 @@ export default function HostRebuttal({
             ))}
             <div
               style={{
-                top: `${getYValue(accusedPosition[1])}px`,
-                right: `${getXValue(accusedPosition[0])}px`,
+                top: `${(accusedPosition[1])}%`,
+                right: `${(accusedPosition[0])}%`,
               }}
               className="w-fit transition-all h-fit rounded-full p-2 absolute  object-right big-shadow pulse-float"
             >
@@ -346,14 +322,7 @@ export default function HostRebuttal({
             className="absolute top-[50%] right-[50vh] transform animate-float size-8 -translate-x-1/2 -translate-y-1/2 object-right"
           /> */}
           </div>
-          <FaArrowLeft
-            onClick={moveLeft}
-            className="cursor-pointer absolute left-10 top-10 size-20 text-purple big-drop-shadow"
-          />
-          <FaArrowRight
-            onClick={moveRight}
-            className="cursor-pointer absolute right-10 top-10 size-20 text-purple big-drop-shadow"
-          />
+
 
           <div className="absolute bottom-6 left-50% select-none">
             <button className="btn-green mt-4" onClick={nextQuestion}>
